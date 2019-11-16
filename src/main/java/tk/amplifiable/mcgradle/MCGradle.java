@@ -145,6 +145,7 @@ public class MCGradle implements Plugin<Project> {
             MCGradleConstants.prepareDirectory(applyCustomPatches.getPatches());
 
             TaskGeneratePatches genPatches = p.getTasks().create(Names.GENERATE_PATCHES, TaskGeneratePatches.class);
+            genPatches.dependsOn(Names.SRC_DEOBF);
             genPatches.setGroup(Names.MAIN_GROUP);
 
             p.getTasks().create(Names.SRC_DEOBF, TaskSourceDeobf.class).dependsOn(Names.MCP_PATCHES).setGroup(Names.OTHER_GROUP);
