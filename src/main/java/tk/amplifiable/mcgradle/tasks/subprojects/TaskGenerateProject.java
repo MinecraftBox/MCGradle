@@ -103,7 +103,7 @@ public class TaskGenerateProject extends DefaultTask {
         }
 
         if (MCGradleConstants.EXTENSION.kotlinVersion != null) {
-            builder.append("    implementation \"org.jetbrains.kotlin:kotlin-stdlib-jdk8\"\n");
+            builder.append("    implementation \"org.jetbrains.kotlin:kotlin-stdlib-jdk8:").append(MCGradleConstants.EXTENSION.kotlinVersion).append("\"\n");
         }
 
         for (JsonElement element : json.getAsJsonArray("libraries")) {
@@ -111,14 +111,26 @@ public class TaskGenerateProject extends DefaultTask {
             if (DependencyUtilities.shouldInclude(obj)) {
                 appendDependency(DependencyUtilities.getDependencyString(obj), builder);
             }
-            /*if (!isNative) {
-                appendDependency(obj.get("name").getAsString(), builder);
-            } else {
-                appendDependency(obj.get("name").getAsString() + ":" + obj.getAsJsonObject("natives"));
-            }*/
         }
 
-        builder.append("}\n");
+        builder.append("}\n\n");
+
+        builder.append("sourceSets {\n" +
+                "    main {\n" +
+                "        java {\n" +
+                "            srcDirs = [new File(project.projectDir, 'src/main/java').getAbsolutePath(), new File(project.rootDir, 'src/main/java').getAbsolutePath()]\n" +
+                "        }\n");
+
+        if (MCGradleConstants.EXTENSION.kotlinVersion != null) {
+            builder.append("        kotlin {\n" +
+                            "            srcDirs = [new File(project.projectDir, 'src/main/java').getAbsolutePath(), new File(project.rootDir, 'src/main/kotlin').getAbsolutePath(), new File(project.rootDir, 'src/main/java').getAbsolutePath()]\n" +
+                            "        }\n");
+        }
+        builder.append("        resources {\n" +
+                "            srcDirs = [new File(project.projectDir, 'src/main/resources').getAbsolutePath(), new File(project.rootDir, 'src/main/resources').getAbsolutePath()]\n" +
+                "        }\n" +
+                "    }\n" +
+                "}\n");
 
         FileWriter writer = new FileWriter(output);
         writer.write(builder.toString());

@@ -34,15 +34,6 @@ public class MCGradle implements Plugin<Project> {
         p.getConfigurations().create(Names.MCP_DATA_CONF);
         p.getConfigurations().create(Names.MCP_MAPPINGS_CONF);
         p.getConfigurations().create(Names.MC_DEPENDENCIES_CONF);
-        p.getChildProjects().get("generated").afterEvaluate(proj -> {
-            if (proj.getPluginManager().hasPlugin("java") && (MCGradleConstants.EXTENSION.kotlinVersion != null && proj.getPluginManager().hasPlugin("kotlin"))) {
-                JavaPluginConvention convention = proj.getConvention().getPlugin(JavaPluginConvention.class);
-                SourceSet main = convention.getSourceSets().getByName(SourceSet.MAIN_SOURCE_SET_NAME);
-                MCGradleGroovy.addSourceSets(proj, main, MCGradleConstants.EXTENSION.kotlinVersion);
-            } else {
-                proj.getLogger().warn("The generated project hasn't been generated yet, skipping source set configuration. Please run the setup task ASAP.");
-            }
-        });
         p.afterEvaluate(proj -> {
             proj.getRepositories().mavenCentral();
             proj.getRepositories().maven(repo -> repo.setUrl("https://files.minecraftforge.net/maven"));
