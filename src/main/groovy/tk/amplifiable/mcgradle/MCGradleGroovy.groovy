@@ -4,12 +4,6 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
 
 class MCGradleGroovy {
-    static void addProjectDependency(Project toAdd, Project toAddTo, String excludeModule) {
-        toAddTo.dependencies.add("implementation", toAdd) {
-            exclude module: excludeModule
-        }
-    }
-
     static void addSourceSets(Project toAddTo, SourceSet set, String ktVer) {
         if (ktVer != null) {
             set.kotlin {
