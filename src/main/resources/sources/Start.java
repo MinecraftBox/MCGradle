@@ -21,17 +21,75 @@ public final class Start {
         addNatives();
         boolean client = true;
         List<String> effectiveArgs = Lists.newArrayList();
-        for (String s : args) {
+        String username = null;
+        String password = null;
+        for (int i = 0; i < args.length; i++) {
+            String s = args[i];
             if (s.equalsIgnoreCase("--server")) {
                 client = false;
+            } else if (s.equalsIgnoreCase("--username")) {
+                username = args[i + 1];
+                i++;
+            } else if (s.equalsIgnoreCase("--password")) {
+                password = args[i + 1];
+                i++;
             } else {
                 effectiveArgs.add(s);
             }
         }
+        String accessToken = "MCGradle";
+        if (username != null && password == null) effectiveArgs.addAll(Arrays.asList("--username", username));
+        else if (password != null && username == null) effectiveArgs.addAll(Arrays.asList("--password", password));
+        else if (username != null) { // password is always null if reached
+            JsonObject config = null;
+            File configFile = new File(RUN_DIRECTORY, "mcgradle/auth.json");
+            if (configFile.exists()) {
+                try (FileReader reader = new FileReader(configFile)) {
+                    JsonParser parser = new JsonParser();
+                    config = parser.parse(reader).getAsJsonObject();
+                } catch (ClassCastException | JsonSyntaxException ex) {
+                    config = null; // just to be sure
+                }
+            }
+            String clientToken = UUID.randomUUID().toString();
+            if (config != null && config.has("clientToken") && config.get("clientToken").isJsonPrimitive() && config.getAsJsonPrimitive("clientToken").isString()) clientToken = config.get("clientToken").getAsString();
+            YggdrasilAuthenticationService authService = new YggdrasilAuthenticationService(Proxy.NO_PROXY, clientToken);
+            UserAuthentication auth = authService.createUserAuthentication(Agent.MINECRAFT);
+            boolean loggedIn = false;
+            if (config != null && config.has("authlibData") && config.get("authlibData").isJsonObject()) {
+                JsonObject authlibData = config.getAsJsonObject("authlibData");
+                try {
+                    Map<String, Object> data = GSON.fromJson(authlibData, new TypeToken<Map<String, Object>>() {}.getType());
+                    auth.loadFromStorage(data);
+                    auth.logIn();
+                    loggedIn = true;
+                } catch (Exception ex) {
+                    loggedIn = false; // just to be sure
+                }
+            }
+            if (!loggedIn) {
+                auth = authService.createUserAuthentication(Agent.MINECRAFT); // Authlib is dumb and prioritizes loadfromstorage so we have to create a new auth thing
+                auth.setUsername(username);
+                auth.setPassword(password);
+                auth.logIn();
+            }
+            config = new JsonObject();
+            config.addProperty("clientToken", authService.getClientToken());
+            config.add("authlibData", GSON.toJsonTree(auth.saveForStorage()));
+            if (!configFile.getParentFile().exists()) {
+                if (!configFile.getParentFile().mkdirs()) {
+                    throw new IOException("Couldn't create configuration file directory");
+                }
+            }
+            try (FileWriter writer = new FileWriter(configFile)) {
+                GSON.toJson(config, writer);
+            }
+            effectiveArgs.addAll(Arrays.asList("--username", auth.getSelectedProfile().getName(), "--uuid", auth.getSelectedProfile().getId().toString()));
+        }
         effectiveArgs.add("--version");
         effectiveArgs.add("MCGradle");
         effectiveArgs.add("--accessToken");
-        effectiveArgs.add("MCGradle");
+        effectiveArgs.add(accessToken);
         effectiveArgs.add("--assetsDir");
         effectiveArgs.add(new File("${assetsDirectory}").getAbsolutePath());
         effectiveArgs.add("--assetIndex");
