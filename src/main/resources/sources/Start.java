@@ -2,17 +2,30 @@ package tk.amplifiable.mcgradle;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.*;
+import com.mojang.authlib.Agent;
+import com.mojang.authlib.UserAuthentication;
+import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.Proxy;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public final class Start {
     private static final File RUN_DIRECTORY = new File("${runDirectory}");
     private static final File NATIVE_DIRECTORY = new File("${nativeDirectory}");
     private static final String CLIENT_MAIN_CLASS = "${clientMainClass}";
     private static final String SERVER_MAIN_CLASS = "${serverMainClass}";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private Start() {
     }
