@@ -1,6 +1,5 @@
 package tk.amplifiable.mcgradle.tasks.mc;
 
-import com.cloudbees.diff.ContextualPatch;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.Patch;
@@ -32,6 +31,7 @@ public class TaskApplyPatches extends DefaultTask {
     @TaskAction
     private void applyPatches() {
         if (!patches.exists()) return;
+        getProject().delete(output);
         if (!sources.equals(output)) {
             getProject().fileTree(sources).visit(new FileVisitor() {
                 @Override

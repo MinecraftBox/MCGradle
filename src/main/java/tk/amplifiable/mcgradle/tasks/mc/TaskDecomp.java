@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.gradle.api.DefaultTask;
+import org.gradle.api.GradleException;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
@@ -49,6 +50,7 @@ public class TaskDecomp extends DefaultTask {
     @TaskAction
     private void decompile() throws IOException {
         File tempDir = new File(MCGradleConstants.CACHE_DIRECTORY, "jars/" + version + "/decompiler");
+        getProject().delete(tempDir);
         MCGradleConstants.prepareDirectory(tempDir);
         File tempJar = new File(tempDir, input.getName());
         Map<String, Object> decompileOptions = Maps.newHashMap();
@@ -63,16 +65,28 @@ public class TaskDecomp extends DefaultTask {
         decompileOptions.put(IFernflowerPreferences.MAX_PROCESSING_METHOD, "0");
         decompileOptions.put(DecompilerContext.RENAMER_FACTORY, AdvancedJarRenamerFactory.class.getName());
 
+        if (Runtime.getRuntime().maxMemory() < 2000L * 1024 * 1024) {
+            throw new GradleException("The decompiler needs at least 2 GB of RAM.");
+        }
+
         PrintStreamLogger logger = new PrintStreamLogger(new PrintStream(new File(tempDir, "decompiler.log").getAbsolutePath()));
+        getLogger().lifecycle(String.format("Creating decompiler with %f MB of RAM", Runtime.getRuntime().maxMemory() / 1024.0 / 1024.0));
         BaseDecompiler decompiler = new BaseDecompiler(new ByteCodeProvider(), new ArtifactSaver(tempDir), decompileOptions, logger);
 
+        getLogger().lifecycle("Adding libraries");
         decompiler.addSpace(input, true);
 
-        for (File library : classpath) {
+        int i = 0;
+        Set<File> files = classpath.getFiles();
+        for (File library : files) {
             decompiler.addSpace(library, false);
         }
 
+        getLogger().lifecycle(String.format("Decompiling with %f MB of RAM", Runtime.getRuntime().maxMemory() / 1024.0 / 1024.0));
         decompiler.decompileContext();
+        getLogger().lifecycle("Running garbage collector");
+        System.gc();
+        getLogger().lifecycle("Copying result");
         FileUtils.copyFile(tempJar, output);
     }
 
@@ -272,5 +286,21 @@ public class TaskDecomp extends DefaultTask {
                 DecompilerContext.getLogger().writeMessage("Cannot close " + file, IFernflowerLogger.Severity.WARN);
             }
         }
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public void setInput(File input) {
+        this.input = input;
+    }
+
+    public void setOutput(File output) {
+        this.output = output;
+    }
+
+    public void setClasspath(FileCollection classpath) {
+        this.classpath = classpath;
     }
 }

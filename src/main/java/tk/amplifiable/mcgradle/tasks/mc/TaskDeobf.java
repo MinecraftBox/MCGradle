@@ -198,4 +198,36 @@ public class TaskDeobf extends DefaultTask {
             public int getStart()  { return Integer.parseInt(start  == null ? "0" : start,  10); }
         }
     }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public void setFieldCsv(File fieldCsv) {
+        this.fieldCsv = fieldCsv;
+    }
+
+    public void setMethodCsv(File methodCsv) {
+        this.methodCsv = methodCsv;
+    }
+
+    public void setJar(File jar) {
+        this.jar = jar;
+    }
+
+    public void setSrg(File srg) {
+        this.srg = srg;
+    }
+
+    public void setExceptorCfg(File exceptorCfg) {
+        this.exceptorCfg = exceptorCfg;
+    }
+
+    public void setExceptorJson(File exceptorJson) {
+        this.exceptorJson = exceptorJson;
+    }
+
+    public void setOut(File out) {
+        this.out = out;
+    }
 }

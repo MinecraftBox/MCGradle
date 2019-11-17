@@ -20,6 +20,7 @@ public class TaskExtractSources extends DefaultTask {
 
     @TaskAction
     private void extract() {
+        getProject().delete(output);
         getProject().zipTree(input).visit(new FileVisitor() {
             @Override
             public void visitDir(FileVisitDetails dirDetails) {

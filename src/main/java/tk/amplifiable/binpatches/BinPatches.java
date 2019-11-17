@@ -31,35 +31,25 @@ public class BinPatches {
      * @throws IOException if something goes wrong
      */
     public static void applyPatches(InputStream patchContainer, InputStream extraEntries, String root, File original, File output) throws IOException {
-        dbg("Applying patches in %s (%s -> %s)", root, original, output);
         Map<String, ClassPatch> patches = Maps.newHashMap();
         Pattern matcher = Pattern.compile("binpatch/" + root + "/.*.binpatch");
-        dbg("Reading patch container");
         LzmaInputStream decompressed = new LzmaInputStream(patchContainer, new Decoder());
         JarInputStream jis = new JarInputStream(decompressed);
-        dbg("Reading patches...");
         for (;;) {
             try {
                 JarEntry entry = jis.getNextJarEntry();
                 if (entry == null) break;
                 if (matcher.matcher(entry.getName()).matches()) {
-                    ClassPatch cp = readPatch(entry, jis);
+                    ClassPatch cp = readPatch(jis);
                     patches.put(cp.sourceClassName.replace('.', '/') + ".class", cp);
                 } else jis.closeEntry();
             } catch (IOException ignored) {}
         }
-        dbg("%d patches read", patches.size());
 
-        if (output.exists()) {
-            if (output.delete()) {
-                throw new IOException("Failed to delete previous output");
-            }
-        }
-
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         ZipFile in = new ZipFile(original);
-        ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(output)));
+        ZipOutputStream out = new ZipOutputStream(bytes);
         Set<String> entries = Sets.newHashSet();
-        dbg("Patching classes...");
         for (ZipEntry entry : Collections.list(in.entries())) {
             if (entry.getName().contains("META-INF")) continue;
             if (entry.isDirectory()) {
@@ -71,7 +61,6 @@ public class BinPatches {
                 byte[] data = ByteStreams.toByteArray(in.getInputStream(entry));
                 ClassPatch patch = patches.get(entry.getName().replace('\\', '/'));
                 if (patch != null) {
-                    dbg("Patching %s (%s), size %d", patch.targetClassName, patch.sourceClassName, data.length);
                     long checksum = adlerHash(data);
                     if (patch.inputChecksum != checksum) {
                         throw new IllegalStateException(String.format("Failed to verify input integrity of %s (%s) (expected %x, got %x).", patch.targetClassName, patch.sourceClassName, checksum, patch.inputChecksum));
@@ -86,7 +75,6 @@ public class BinPatches {
         }
 
         if (extraEntries != null) {
-            dbg("Adding extra entries");
             ZipInputStream extraIn = new ZipInputStream(extraEntries);
             ZipEntry entry;
             while ((entry = extraIn.getNextEntry()) != null) {
@@ -99,10 +87,13 @@ public class BinPatches {
         }
         in.close();
         out.close();
+
+        FileOutputStream fos = new FileOutputStream(output);
+        fos.write(bytes.toByteArray());
+        fos.close();
     }
 
-    private static ClassPatch readPatch(JarEntry patchEntry, JarInputStream jis) throws IOException {
-        dbg("Reading patch %s", patchEntry.getName());
+    private static ClassPatch readPatch(JarInputStream jis) throws IOException {
         ByteArrayDataInput input = ByteStreams.newDataInput(ByteStreams.toByteArray(jis));
         String name = input.readUTF();
         String sourceClassName = input.readUTF();
@@ -116,10 +107,6 @@ public class BinPatches {
         byte[] patchBytes = new byte[patchLength];
         input.readFully(patchBytes);
         return new ClassPatch(name, sourceClassName, targetClassName, exists, patchBytes, inputChecksum);
-    }
-
-    private static void dbg(String message, Object... format) {
-        System.out.println(String.format("[dbg] %s", String.format(message, format)));
     }
 
     private static long adlerHash(byte[] bytes) {

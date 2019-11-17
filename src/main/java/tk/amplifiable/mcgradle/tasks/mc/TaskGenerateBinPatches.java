@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.jar.*;
 import java.util.zip.Adler32;
 
@@ -35,10 +34,13 @@ public class TaskGenerateBinPatches extends DefaultTask {
     private File cleanServer = new File(MCGradleConstants.CACHE_DIRECTORY, String.format("jars/%s/server.jar", version));
 
     @InputFile
-    private File cleanMerged = new File(MCGradleConstants.CACHE_DIRECTORY, String.format("jars/%s/merged.jar", version));
+    private File cleanDev = new File(MCGradleConstants.CACHE_DIRECTORY, String.format("jars/%s/recompiled.jar", version));
 
     @InputFile
     private File dirtyJar = new File(getProject().getChildProjects().get("generated").getBuildDir(), "/projectCache/reobfuscated.jar");
+
+    @InputFile
+    private File dirtyDev = new File(getProject().getChildProjects().get("generated").getBuildDir(), "/projectCache/recompiled.jar");
 
     @InputFile
     private File srg = new File(MCGradleConstants.CACHE_DIRECTORY, "jars/" + version + "/mappings/srgs/notch-srg.srg");
@@ -73,9 +75,9 @@ public class TaskGenerateBinPatches extends DefaultTask {
         Map<String, byte[]> runtime = Maps.newHashMap();
         Map<String, byte[]> devtime = Maps.newHashMap();
 
-        createBinPatches(runtime, "client/", cleanClient, dirtyJar);
-        createBinPatches(runtime, "server/", cleanServer, dirtyJar);
-        createBinPatches(devtime, "merged/", cleanMerged, dirtyJar);
+        createBinPatches(runtime, "client/", cleanClient, dirtyJar, true);
+        createBinPatches(runtime, "server/", cleanServer, dirtyJar, true);
+        createBinPatches(devtime, "merged/", cleanDev, dirtyDev, false);
 
         MCGradleConstants.prepareDirectory(runBinPatches.getParentFile());
         MCGradleConstants.prepareDirectory(devBinPatches.getParentFile());
@@ -89,7 +91,7 @@ public class TaskGenerateBinPatches extends DefaultTask {
         Files.write(devtimeData, devBinPatches);
     }
 
-    private void createBinPatches(Map<String, byte[]> patches, String root, File base, File target) throws IOException {
+    private void createBinPatches(Map<String, byte[]> patches, String root, File base, File target, boolean reobfNames) throws IOException {
         JarFile cleanJar = new JarFile(base);
         JarFile dirtyJar = new JarFile(target);
 
@@ -97,16 +99,17 @@ public class TaskGenerateBinPatches extends DefaultTask {
             String obf = entry.getKey();
             String srg = entry.getValue();
             if (!patchedFiles.contains(obf)) continue;
-            JarEntry cleanEntry = cleanJar.getJarEntry(obf + ".class");
-            JarEntry dirtyEntry = dirtyJar.getJarEntry(obf + ".class");
+            String entryName = reobfNames ? obf : srg;
+            JarEntry cleanEntry = cleanJar.getJarEntry(entryName + ".class");
+            JarEntry dirtyEntry = dirtyJar.getJarEntry(entryName + ".class");
             if (dirtyEntry == null) continue;
             byte[] clean = cleanEntry != null ? ByteStreams.toByteArray(cleanJar.getInputStream(cleanEntry)) : new byte[0];
             byte[] dirty = ByteStreams.toByteArray(dirtyJar.getInputStream(dirtyEntry));
 
             byte[] diff = delta.compute(clean, dirty);
             ByteArrayDataOutput out = ByteStreams.newDataOutput(diff.length + 50);
-            out.writeUTF(obf);
-            out.writeUTF(obf.replace('/', '.'));
+            out.writeUTF(entryName);
+            out.writeUTF(entryName.replace('/', '.'));
             out.writeUTF(srg.replace('/', '.'));
             out.writeBoolean(cleanEntry != null);
             if (cleanEntry != null) {

@@ -10,6 +10,7 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
@@ -31,7 +32,7 @@ public class TaskRecompileClean extends DefaultTask {
     private String version = MCGradleConstants.EXTENSION.version;
 
     @InputFiles
-    private File sources = new File(MCGradleConstants.CACHE_DIRECTORY, "jars/" + version + "/patched/mcp");
+    private File sources = new File(MCGradleConstants.CACHE_DIRECTORY, "jars/" + version + "/sourceMapped");
 
     @OutputFile
     private File outputJar = new File(MCGradleConstants.CACHE_DIRECTORY, "jars/" + version + "/recompiled.jar");
@@ -176,18 +177,22 @@ public class TaskRecompileClean extends DefaultTask {
         }
     }
 
+    @Input
     public String getVersion() {
         return version;
     }
 
+    @InputFiles
     public File getSources() {
         return sources;
     }
 
+    @OutputFile
     public File getOutputJar() {
         return outputJar;
     }
 
+    @InputFiles
     public FileCollection getClasspath() {
         return classpath;
     }

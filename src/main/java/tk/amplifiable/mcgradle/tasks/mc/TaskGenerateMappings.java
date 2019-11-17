@@ -31,6 +31,7 @@ public class TaskGenerateMappings extends DefaultTask {
 
     @TaskAction
     public void generate() throws IOException {
+        getProject().delete(outputDirectory);
         MCGradleConstants.prepareDirectory(outputDirectory);
         Utils.ExtractingFileVisitor visitor = new Utils.ExtractingFileVisitor(outputDirectory);
         for (File source : getFiles1()) {

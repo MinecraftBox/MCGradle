@@ -152,19 +152,20 @@ public class MCGradle implements Plugin<Project> {
         p.getTasks().create(Names.RUN_JAR_TASK, TaskRunJarTask.class).setGroup(Names.OTHER_GROUP);
 
         TaskRecompileClean recomp = p.getTasks().create(Names.RECOMPILE, TaskRecompileClean.class);
-        recomp.dependsOn(Names.MCP_PATCHES, Names.RESOLVE_DEPENDENCIES).setGroup(Names.OTHER_GROUP);
+        recomp.dependsOn(Names.RESOLVE_DEPENDENCIES);
+        //recomp.dependsOn(Names.SRC_DEOBF, Names.RESOLVE_DEPENDENCIES).setGroup(Names.OTHER_GROUP);
 
         p.getTasks().create(Names.REOBFUSCATE_JAR, TaskReobf.class).dependsOn(Names.DEOBF, Names.RUN_JAR_TASK, Names.RESOLVE_DEPENDENCIES, Names.GEN_MAPPINGS).setGroup(Names.OTHER_GROUP);
 
-        p.getTasks().create(Names.GEN_BIN_PATCHES, TaskGenerateBinPatches.class).dependsOn(Names.RECOMPILE, Names.DEOBF, Names.REOBFUSCATE_JAR).setGroup(Names.OTHER_GROUP);
+        p.getTasks().create(Names.GEN_BIN_PATCHES, TaskGenerateBinPatches.class).dependsOn(Names.GENERATE_PATCHES, Names.RECOMPILE, Names.DEOBF, Names.REOBFUSCATE_JAR).setGroup(Names.OTHER_GROUP);
 
         TaskReobf task = p.getTasks().create(Names.REOBFUSCATE_CLEAN, TaskReobf.class);
         task.setInput(recomp.getOutputJar());
         task.setOutput(new File(MCGradleConstants.CACHE_DIRECTORY, String.format("jars/%s/reobf.jar", MCGradleConstants.EXTENSION.version)));
         task.dependsOn(Names.DEOBF, Names.RECOMPILE, Names.RESOLVE_DEPENDENCIES, Names.GEN_MAPPINGS).setGroup(Names.OTHER_GROUP);
 
-        p.getTasks().create(Names.GENERATE_EXTRA, TaskGenerateExtra.class).dependsOn(Names.REOBFUSCATE_JAR, Names.MERGE).setGroup(Names.OTHER_GROUP);
+        p.getTasks().create(Names.GENERATE_EXTRA, TaskGenerateExtra.class).dependsOn(Names.GEN_BIN_PATCHES, Names.REOBFUSCATE_JAR, Names.MERGE).setGroup(Names.OTHER_GROUP);
 
-        p.getTasks().create("build").dependsOn(Names.GENERATE_EXTRA, Names.GEN_BIN_PATCHES).setGroup("build");
+        p.getTasks().create("distrib").dependsOn(Names.GENERATE_EXTRA, Names.GEN_BIN_PATCHES).setGroup("build");
     }
 }

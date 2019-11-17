@@ -54,6 +54,10 @@ public class Utils {
         } catch (NoSuchAlgorithmException e) {
             throw new GradleException("SHA-1 isn't known", e);
         }
+        return hexHash(digest, file);
+    }
+
+    private static String hexHash(MessageDigest digest, File file) throws IOException {
         try (InputStream input = new FileInputStream(file)) {
             byte[] buffer = new byte[4096];
             int length = input.read(buffer);
@@ -63,6 +67,16 @@ public class Utils {
             }
             return new HexBinaryAdapter().marshal(digest.digest()).toLowerCase();
         }
+    }
+
+    public static String sha256(File file) throws IOException {
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new GradleException("SHA-256 isn't known", e);
+        }
+        return hexHash(digest, file);
     }
 
     public static class ExtractingFileVisitor implements FileVisitor {

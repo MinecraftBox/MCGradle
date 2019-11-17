@@ -9,6 +9,7 @@ import org.gradle.api.tasks.TaskAction;
 import tk.amplifiable.mcgradle.MCGradleConstants;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -27,8 +28,14 @@ public class TaskGenerateExtra extends DefaultTask {
     @InputFile
     private File original = new File(MCGradleConstants.CACHE_DIRECTORY, String.format("jars/%s/merged.jar", version));
 
+    @InputFile
+    private File runBinPatches = new File(getProject().getBuildDir(), "distrib/binpatches.lzma");
+
+    @InputFile
+    private File devBinPatches = new File(getProject().getBuildDir(), "distrib/binpatches.dev.lzma");
+
     @OutputFile
-    private File output = new File(getProject().getBuildDir(), "distrib/extra.jar");
+    private File output = new File(getProject().getBuildDir(), "distrib/distrib.jar");
 
     @TaskAction
     private void generate() throws IOException {
@@ -37,7 +44,7 @@ public class TaskGenerateExtra extends DefaultTask {
         try (ZipOutputStream output = new ZipOutputStream(new FileOutputStream(this.output))) {
             List<? extends ZipEntry> entries = reobf.stream().filter(entry -> {
                 String name = entry.getName();
-                return !(name.equals("tk/amplifiable/mcgradle/Start.class") || name.equals("tk/amplifiable/mcgradle/Properties.class"));
+                return !(name.equals("tk/amplifiable/mcgradle/Start.class") || name.equals("tk/amplifiable/mcgradle/Start$1.class") || name.equals("tk/amplifiable/mcgradle/Properties.class"));
             }).collect(Collectors.toList());
             entries.forEach(entry -> {
                 try {
@@ -55,6 +62,12 @@ public class TaskGenerateExtra extends DefaultTask {
                     }
                 } catch (IOException ignored) {}
             });
+            ZipEntry entry = new ZipEntry("binpatches.lzma");
+            output.putNextEntry(entry);
+            output.write(ByteStreams.toByteArray(new FileInputStream(runBinPatches)));
+            entry = new ZipEntry("binpatches.dev.lzma");
+            output.putNextEntry(entry);
+            output.write(ByteStreams.toByteArray(new FileInputStream(devBinPatches)));
         }
         reobf.close();
         original.close();

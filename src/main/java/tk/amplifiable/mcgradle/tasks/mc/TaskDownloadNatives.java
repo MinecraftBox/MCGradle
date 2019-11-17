@@ -32,6 +32,7 @@ public class TaskDownloadNatives extends DefaultTask {
     @TaskAction
     private void downloadNatives() throws IOException {
         JsonObject json = Utils.readJsonObj(versionJson);
+        getProject().delete(output);
         MCGradleConstants.prepareDirectory(output);
         for (JsonElement element : json.getAsJsonArray("libraries")) {
             JsonObject obj = element.getAsJsonObject();
