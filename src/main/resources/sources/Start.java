@@ -97,6 +97,7 @@ public final class Start {
             try (FileWriter writer = new FileWriter(configFile)) {
                 GSON.toJson(config, writer);
             }
+            accessToken = auth.getAuthenticatedToken();
             effectiveArgs.addAll(Arrays.asList("--username", auth.getSelectedProfile().getName(), "--uuid", auth.getSelectedProfile().getId().toString()));
         }
         effectiveArgs.add("--version");
