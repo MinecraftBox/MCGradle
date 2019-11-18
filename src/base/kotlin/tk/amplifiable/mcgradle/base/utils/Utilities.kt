@@ -138,3 +138,8 @@ fun checkValidConstantProperty(it: Any?) {
     if (it == null) throw GradleException("Properties cannot be null")
     if (!validPropertyClasses.contains(it.javaClass)) throw GradleException("Invalid property type ${it.javaClass.name}")
 }
+
+@Suppress("UNCHECKED_CAST")
+fun <T> castTo(obj: Any) = obj as T // i hate unchecked warnings so this method is perfect for me - amp
+
+fun <T : Task> Project.getTask(name: String) = castTo<T>(project.tasks.getByName(name))

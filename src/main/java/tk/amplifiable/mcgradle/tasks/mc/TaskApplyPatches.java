@@ -31,7 +31,6 @@ public class TaskApplyPatches extends DefaultTask {
     @TaskAction
     private void applyPatches() {
         if (!patches.exists()) return;
-        getProject().delete(output);
         if (!sources.equals(output)) {
             getProject().fileTree(sources).visit(new FileVisitor() {
                 @Override
