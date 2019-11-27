@@ -4,6 +4,7 @@ import com.google.common.hash.Hashing;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import groovy.json.StringEscapeUtils;
+import org.apache.commons.io.IOUtils;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;
@@ -61,14 +62,8 @@ public class Utils {
 
     private static String hexHash(MessageDigest digest, File file) throws IOException {
         try (InputStream input = new FileInputStream(file)) {
-            byte[] buffer = new byte[4096];
-            int length = input.read(buffer);
-            while (length != -1) {
-                digest.update(buffer, 0, length);
-                length = input.read(buffer);
-            }
             return Hashing.sha256()
-                    .hashBytes(digest.digest())
+                    .hashBytes(IOUtils.toByteArray(input))
                     .toString();
         }
     }
