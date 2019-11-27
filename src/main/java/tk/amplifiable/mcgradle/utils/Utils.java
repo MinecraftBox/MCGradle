@@ -65,7 +65,11 @@ public class Utils {
                 digest.update(buffer, 0, length);
                 length = input.read(buffer);
             }
-            return String.format("%02x", digest.digest()).toLowerCase();
+            StringBuilder sb = new StringBuilder();
+            for (byte b : digest.digest()) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString().toLowerCase();
         }
     }
 
