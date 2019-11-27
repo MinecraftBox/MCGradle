@@ -1,5 +1,6 @@
 package tk.amplifiable.mcgradle.utils;
 
+import com.google.common.hash.Hashing;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import groovy.json.StringEscapeUtils;
@@ -11,6 +12,7 @@ import tk.amplifiable.mcgradle.Names;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -65,11 +67,9 @@ public class Utils {
                 digest.update(buffer, 0, length);
                 length = input.read(buffer);
             }
-            StringBuilder sb = new StringBuilder();
-            for (byte b : digest.digest()) {
-                sb.append(Integer.toHexString(b));
-            }
-            return sb.toString().toLowerCase();
+            return Hashing.sha256()
+                    .hashBytes(digest.digest())
+                    .toString();
         }
     }
 
