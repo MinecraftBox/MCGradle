@@ -67,7 +67,7 @@ public class Utils {
             }
             StringBuilder sb = new StringBuilder();
             for (byte b : digest.digest()) {
-                sb.append(String.format("%02x", b));
+                sb.append(Integer.toHexString(b));
             }
             return sb.toString().toLowerCase();
         }
