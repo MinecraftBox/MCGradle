@@ -65,7 +65,7 @@ public class Utils {
                 digest.update(buffer, 0, length);
                 length = input.read(buffer);
             }
-            return new HexBinaryAdapter().marshal(digest.digest()).toLowerCase();
+            return String.format("%02x", (Object) digest.digest()).toLowerCase();
         }
     }
 
