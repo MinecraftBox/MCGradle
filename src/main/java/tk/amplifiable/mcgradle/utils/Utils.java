@@ -51,31 +51,19 @@ public class Utils {
     }
 
     public static String sha1(File file) throws IOException {
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-1");
-        } catch (NoSuchAlgorithmException e) {
-            throw new GradleException("SHA-1 isn't known", e);
-        }
-        return hexHash(digest, file);
-    }
-
-    private static String hexHash(MessageDigest digest, File file) throws IOException {
         try (InputStream input = new FileInputStream(file)) {
-            return Hashing.sha256()
+            return Hashing.sha1()
                     .hashBytes(IOUtils.toByteArray(input))
                     .toString();
         }
     }
 
     public static String sha256(File file) throws IOException {
-        MessageDigest digest;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new GradleException("SHA-256 isn't known", e);
+        try (InputStream input = new FileInputStream(file)) {
+            return Hashing.sha256()
+                    .hashBytes(IOUtils.toByteArray(input))
+                    .toString();
         }
-        return hexHash(digest, file);
     }
 
     public static class ExtractingFileVisitor implements FileVisitor {
