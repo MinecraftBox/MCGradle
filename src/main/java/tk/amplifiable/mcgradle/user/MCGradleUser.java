@@ -144,6 +144,7 @@ public class MCGradleUser implements Plugin<Project> {
 
             Task copyTask = p.getTasks().create("copyJar", CopyJarTask.class);
             copyTask.dependsOn(MCGradleUserConstants.APPLY_BIN_PATCHES);
+            copyTask.setGroup("mcgradle-other");
 
             p.getRepositories().maven(repo -> repo.setUrl(new File(MCGradleConstants.CACHE_DIRECTORY, "repo").toURI()));
             p.getDependencies().add("compile", ImmutableMap.of(
@@ -180,6 +181,8 @@ public class MCGradleUser implements Plugin<Project> {
                     }
                 }
             }
+
+            p.getTasks().create("setup").dependsOn("copyJar").setGroup("mcgradle");
         });
     }
 

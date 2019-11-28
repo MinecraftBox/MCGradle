@@ -28,7 +28,7 @@ public class TaskApplyBinPatches extends DefaultTask {
     @TaskAction
     private void applyPatches() throws IOException {
         try (ZipFile file = new ZipFile(getDistribution())) {
-            try (InputStream inputStream = file.getInputStream(file.getEntry("binpatches.dev.lzma"))) {
+            try (InputStream inputStream = file.getInputStream(file.getEntry("binpatches.lzma"))) {
                 try (FileInputStream extraInputStream = new FileInputStream(getDistribution())) {
                     BinPatches.applyPatches(inputStream, extraInputStream, "merged", getInput(), getOutput());
                 }
