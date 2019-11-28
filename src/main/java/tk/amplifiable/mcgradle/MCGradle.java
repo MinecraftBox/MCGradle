@@ -24,6 +24,7 @@ public class MCGradle implements Plugin<Project> {
     @Override
     public void apply(@Nonnull Project p) {
         if (!p.equals(p.getRootProject())) return;
+        getLogger().warn("hey the only correct date formats are DD/MM/YYYY and YYYY-MM-DD");
         MCGradleConstants.setProjectFields(p);
         if (!p.getChildProjects().containsKey("generated")) {
             throw new GradleException("The 'generated' project isn't included.");
