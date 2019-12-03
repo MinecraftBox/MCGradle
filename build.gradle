@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'tk.amplifiable.mcgradle'
-version '1.2.3'
+version '1.2.4'
 
 repositories {
     mavenCentral()
@@ -34,6 +34,7 @@ sourceSets {
     base {}
     patch {}
     user {}
+    patchgen {}
 }
 
 dependencies {
@@ -43,26 +44,31 @@ dependencies {
     baseImplementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
 
     patchImplementation sourceSets.base.output
+    patchgenImplementation sourceSets.base.output
     userImplementation sourceSets.base.output
-    
-    /*
-    ---
-    UNCOMMENT WHEN FULLY PORTED TO KOTLIN AND MAIN SOURCE IS GONE
-    ---
-    implementation sourceSets.patch.output
-    implementation sourceSets.user.output
-     */
 
     implementation gradleApi()
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.5.1.201910021850-r'
     compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
-    compile group: 'org.ow2.asm', name: 'asm-all', version: '5.2'
+    implementation group: 'org.ow2.asm', name: 'asm', version: '7.2'
+    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '7.2'
+    implementation group: 'org.ow2.asm', name: 'asm-util', version: '7.2'
+    implementation group: 'org.ow2.asm', name: 'asm-commons', version: '7.2'
+
     compile 'net.sf.opencsv:opencsv:2.3'
-    compile 'de.oceanlabs.mcp:RetroGuard:3.6.6'
-    compile 'de.oceanlabs.mcp:mcinjector:3.4-SNAPSHOT'
-    compile 'net.minecraftforge.srg2source:Srg2Source:3.3-SNAPSHOT'
-    compile 'net.md-5:SpecialSource:1.7.4'
+    compile('de.oceanlabs.mcp:RetroGuard:3.6.6') {
+        exclude module: 'asm-debug-all'
+    }
+    compile('de.oceanlabs.mcp:mcinjector:3.4-SNAPSHOT') {
+        exclude module: 'asm-debug-all'
+    }
+    compile('net.minecraftforge.srg2source:Srg2Source:3.3-SNAPSHOT') {
+        exclude module: 'asm-debug-all'
+    }
+    compile('net.md-5:SpecialSource:1.7.4') {
+        exclude module: 'asm-debug-all'
+    }
     compile 'com.cloudbees:diff4j:1.1'
     compile 'net.minecraftforge:fernflower:2.0-SNAPSHOT'
     compile 'com.github.abrarsyed.jastyle:jAstyle:1.3'
@@ -71,8 +77,26 @@ dependencies {
     compile 'io.github.java-diff-utils:java-diff-utils:4.4'
 }
 
+jar {
+    from sourceSets.main.output
+    from sourceSets.patch.output
+    from sourceSets.patchgen.output
+    from sourceSets.user.output
+    from sourceSets.base.output
+
+    dependsOn mainClasses
+    dependsOn patchClasses
+    dependsOn patchgenClasses
+    dependsOn userClasses
+    dependsOn baseClasses
+}
+
 task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
+    from sourceSets.main.allSource
+    from sourceSets.patch.allSource
+    from sourceSets.patchgen.allSource
+    from sourceSets.user.allSource
+    from sourceSets.base.allSource
     archiveClassifier = 'sources'
 }
 
