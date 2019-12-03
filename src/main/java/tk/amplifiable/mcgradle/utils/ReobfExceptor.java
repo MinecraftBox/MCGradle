@@ -244,7 +244,7 @@ public class ReobfExceptor {
         private final Map<String, AccessInfo> access = Maps.newHashMap();
 
         public JarInfo() {
-            super(Opcodes.ASM4, null);
+            super(Opcodes.ASM7, null);
         }
 
         private String className;
@@ -276,7 +276,7 @@ public class ReobfExceptor {
                 info.access = acc;
                 access.put(path, info);
 
-                return new MethodVisitor(Opcodes.ASM5) {
+                return new MethodVisitor(Opcodes.ASM7) {
                     @Override
                     public void visitFieldInsn(int opcode, String owner, String name, String desc) {
                         info.add(opcode, owner, name, desc);
