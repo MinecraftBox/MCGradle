@@ -37,10 +37,19 @@ dependencies {
     baseImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     baseImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
     baseImplementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+    baseImplementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.5.1.201910021850-r'
 
     patchImplementation sourceSets.base.output
+    patchImplementation sourceSets.base.compileClasspath
     patchgenImplementation sourceSets.base.output
+    patchgenImplementation sourceSets.base.compileClasspath
     userImplementation sourceSets.base.output
+    userImplementation sourceSets.base.compileClasspath
+
+    implementation sourceSets.base.compileClasspath
+    implementation sourceSets.patch.compileClasspath
+    implementation sourceSets.patchgen.compileClasspath
+    implementation sourceSets.user.compileClasspath
 
     /*implementation gradleApi()
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.5.1.201910021850-r'

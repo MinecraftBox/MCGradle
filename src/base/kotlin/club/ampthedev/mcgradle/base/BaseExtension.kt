@@ -3,6 +3,7 @@ package club.ampthedev.mcgradle.base
 import groovy.lang.GroovyObjectSupport
 import org.gradle.api.GradleException
 import club.ampthedev.mcgradle.base.utils.checkValidConstantProperty
+import club.ampthedev.mcgradle.base.versioning.GitVersion
 
 abstract class BaseExtension : GroovyObjectSupport() {
     var version = "1.8.9"
@@ -12,7 +13,16 @@ abstract class BaseExtension : GroovyObjectSupport() {
     var clientMainClass = "net.minecraft.client.main.Main"
     var serverMainClass = "net.minecraft.server.dedicated.DedicatedServer"
     var kotlinVersion: String? = null
+    var gitVersion: Boolean = false
+        set(v) {
+            BasePlugin.currentProject.version = GitVersion.gitVersion(BasePlugin.currentProject.projectDir)
+            field = v
+        }
     private val properties = hashMapOf<String, Any>()
+
+    fun gitVersion(gitVersion: Boolean) {
+        this.gitVersion = gitVersion
+    }
 
     fun version(version: String) {
         this.version = version
