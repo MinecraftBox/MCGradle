@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.utils;
+package club.ampthedev.mcgradle.utils;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;

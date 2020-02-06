@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
@@ -11,7 +11,7 @@ import org.gradle.api.file.FileVisitor;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
-import tk.amplifiable.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.MCGradleConstants;
 
 import java.io.File;
 import java.nio.file.Files;

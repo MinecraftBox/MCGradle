@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.subprojects;
+package club.ampthedev.mcgradle.tasks.subprojects;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -11,10 +11,10 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import tk.amplifiable.mcgradle.MCGradleConstants;
-import tk.amplifiable.mcgradle.Names;
-import tk.amplifiable.mcgradle.utils.Utils;
-import tk.amplifiable.mcgradle.mc.DependencyUtilities;
+import club.ampthedev.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.Names;
+import club.ampthedev.mcgradle.utils.Utils;
+import club.ampthedev.mcgradle.mc.DependencyUtilities;
 
 import java.io.File;
 import java.io.FileWriter;

@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
@@ -12,9 +12,9 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
-import tk.amplifiable.mcgradle.MCGradleConstants;
-import tk.amplifiable.mcgradle.Names;
-import tk.amplifiable.mcgradle.utils.Utils;
+import club.ampthedev.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.Names;
+import club.ampthedev.mcgradle.utils.Utils;
 
 import java.io.*;
 import java.nio.charset.Charset;

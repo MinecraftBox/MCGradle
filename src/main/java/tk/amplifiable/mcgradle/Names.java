@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle;
+package club.ampthedev.mcgradle;
 
 public class Names {
     public static String EXTENSION = "mcgradle";

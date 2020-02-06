@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import com.google.common.io.ByteStreams;
 import org.gradle.api.DefaultTask;
@@ -6,7 +6,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import tk.amplifiable.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.MCGradleConstants;
 
 import java.io.File;
 import java.io.FileInputStream;

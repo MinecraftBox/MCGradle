@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
@@ -13,7 +13,7 @@ import org.gradle.api.GradleException;
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;
 import org.gradle.api.tasks.*;
-import tk.amplifiable.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.MCGradleConstants;
 
 import java.io.File;
 import java.io.FileWriter;

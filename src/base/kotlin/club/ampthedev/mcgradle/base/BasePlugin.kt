@@ -1,8 +1,8 @@
-package tk.amplifiable.mcgradle.base
+package club.ampthedev.mcgradle.base
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import tk.amplifiable.mcgradle.base.utils.*
+import club.ampthedev.mcgradle.base.utils.*
 
 abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
     protected abstract val extension: T

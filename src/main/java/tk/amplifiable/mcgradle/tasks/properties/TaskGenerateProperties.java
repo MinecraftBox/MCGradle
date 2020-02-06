@@ -1,12 +1,12 @@
-package tk.amplifiable.mcgradle.tasks.properties;
+package club.ampthedev.mcgradle.tasks.properties;
 
 import com.google.common.collect.Maps;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import tk.amplifiable.mcgradle.MCGradleConstants;
-import tk.amplifiable.mcgradle.utils.Utils;
+import club.ampthedev.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.utils.Utils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -24,7 +24,7 @@ public class TaskGenerateProperties extends DefaultTask {
     public void generate() throws IOException {
         MCGradleConstants.prepareDirectory(out.getParentFile());
         StringBuilder builder = new StringBuilder();
-        builder.append("package tk.amplifiable.mcgradle;\n" +
+        builder.append("package club.ampthedev.mcgradle;\n" +
                 "\n" +
                 "public final class Properties {\n");
         for (Map.Entry<String, String> property : properties.entrySet()) {

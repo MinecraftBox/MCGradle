@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import com.cloudbees.diff.Diff;
 import com.cloudbees.diff.Hunk;
@@ -14,7 +14,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
-import tk.amplifiable.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.MCGradleConstants;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

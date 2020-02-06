@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.base.utils
+package club.ampthedev.mcgradle.base.utils
 
 import com.google.gson.JsonObject
 import org.apache.tools.ant.taskdefs.condition.Os

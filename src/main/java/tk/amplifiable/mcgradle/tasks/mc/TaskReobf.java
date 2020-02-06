@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import com.google.common.io.Files;
 import net.md_5.specialsource.JarMapping;
@@ -10,9 +10,9 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.bundling.Jar;
-import tk.amplifiable.mcgradle.MCGradleConstants;
-import tk.amplifiable.mcgradle.Names;
-import tk.amplifiable.mcgradle.utils.ReobfExceptor;
+import club.ampthedev.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.Names;
+import club.ampthedev.mcgradle.utils.ReobfExceptor;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle;
+package club.ampthedev.mcgradle;
 
 import org.gradle.api.GradleException;
 import org.gradle.api.Project;

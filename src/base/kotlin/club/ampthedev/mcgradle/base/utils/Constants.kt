@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.base.utils
+package club.ampthedev.mcgradle.base.utils
 
 const val EXTENSION_NAME = "mcgradle"
 

@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.mc;
+package club.ampthedev.mcgradle.mc;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

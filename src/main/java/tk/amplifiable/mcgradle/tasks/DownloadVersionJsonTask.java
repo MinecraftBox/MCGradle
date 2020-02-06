@@ -1,13 +1,13 @@
-package tk.amplifiable.mcgradle.tasks;
+package club.ampthedev.mcgradle.tasks;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.gradle.api.GradleException;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
-import tk.amplifiable.mcgradle.MCGradleConstants;
-import tk.amplifiable.mcgradle.Names;
-import tk.amplifiable.mcgradle.utils.Utils;
+import club.ampthedev.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.Names;
+import club.ampthedev.mcgradle.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
@@ -14,8 +14,8 @@ import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
-import tk.amplifiable.mcgradle.MCGradleConstants;
-import tk.amplifiable.mcgradle.Names;
+import club.ampthedev.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.Names;
 
 import java.io.File;
 import java.io.FileInputStream;

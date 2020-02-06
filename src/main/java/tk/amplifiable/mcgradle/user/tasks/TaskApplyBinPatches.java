@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.user.tasks;
+package club.ampthedev.mcgradle.user.tasks;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Input;
@@ -6,8 +6,8 @@ import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 import tk.amplifiable.binpatches.BinPatches;
-import tk.amplifiable.mcgradle.MCGradleConstants;
-import tk.amplifiable.mcgradle.user.MCGradleUser;
+import club.ampthedev.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.user.MCGradleUser;
 
 import java.io.File;
 import java.io.FileInputStream;

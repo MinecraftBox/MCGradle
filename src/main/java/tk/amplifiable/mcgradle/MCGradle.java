@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle;
+package club.ampthedev.mcgradle;
 
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.GradleException;
@@ -7,14 +7,14 @@ import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.tasks.SourceSet;
-import tk.amplifiable.mcgradle.tasks.DownloadTask;
-import tk.amplifiable.mcgradle.tasks.DownloadVersionJsonTask;
-import tk.amplifiable.mcgradle.tasks.TaskSetup;
-import tk.amplifiable.mcgradle.tasks.mc.*;
-import tk.amplifiable.mcgradle.tasks.properties.TaskGenerateProperties;
-import tk.amplifiable.mcgradle.tasks.subprojects.TaskCopySources;
-import tk.amplifiable.mcgradle.tasks.subprojects.TaskGenerateProject;
-import tk.amplifiable.mcgradle.utils.Utils;
+import club.ampthedev.mcgradle.tasks.DownloadTask;
+import club.ampthedev.mcgradle.tasks.DownloadVersionJsonTask;
+import club.ampthedev.mcgradle.tasks.TaskSetup;
+import club.ampthedev.mcgradle.tasks.mc.*;
+import club.ampthedev.mcgradle.tasks.properties.TaskGenerateProperties;
+import club.ampthedev.mcgradle.tasks.subprojects.TaskCopySources;
+import club.ampthedev.mcgradle.tasks.subprojects.TaskGenerateProject;
+import club.ampthedev.mcgradle.utils.Utils;
 
 import javax.annotation.Nonnull;
 import java.io.File;

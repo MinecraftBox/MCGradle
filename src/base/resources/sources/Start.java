@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle;
+package club.ampthedev.mcgradle;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;

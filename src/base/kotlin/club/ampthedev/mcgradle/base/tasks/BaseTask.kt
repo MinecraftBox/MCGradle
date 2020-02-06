@@ -1,8 +1,8 @@
-package tk.amplifiable.mcgradle.base.tasks
+package club.ampthedev.mcgradle.base.tasks
 
 import org.gradle.api.DefaultTask
-import tk.amplifiable.mcgradle.base.utils.GROUP_MAIN
-import tk.amplifiable.mcgradle.base.utils.GROUP_OTHER
+import club.ampthedev.mcgradle.base.utils.GROUP_MAIN
+import club.ampthedev.mcgradle.base.utils.GROUP_OTHER
 
 enum class TaskType(val groupName: String) {
     MAIN(GROUP_MAIN),

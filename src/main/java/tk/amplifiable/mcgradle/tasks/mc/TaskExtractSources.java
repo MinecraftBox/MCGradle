@@ -1,10 +1,10 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;
 import org.gradle.api.tasks.*;
-import tk.amplifiable.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.MCGradleConstants;
 
 import java.io.File;
 

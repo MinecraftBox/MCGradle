@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks;
+package club.ampthedev.mcgradle.tasks;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;

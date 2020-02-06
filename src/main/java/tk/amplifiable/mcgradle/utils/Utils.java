@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.utils;
+package club.ampthedev.mcgradle.utils;
 
 import com.google.common.hash.Hashing;
 import com.google.gson.JsonObject;
@@ -8,8 +8,8 @@ import org.apache.commons.io.IOUtils;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;
-import tk.amplifiable.mcgradle.MCGradleConstants;
-import tk.amplifiable.mcgradle.Names;
+import club.ampthedev.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.Names;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import java.io.*;

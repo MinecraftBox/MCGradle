@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks;
+package club.ampthedev.mcgradle.tasks;
 
 import org.gradle.api.DefaultTask;
 

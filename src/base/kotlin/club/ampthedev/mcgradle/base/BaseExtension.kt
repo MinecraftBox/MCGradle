@@ -1,8 +1,8 @@
-package tk.amplifiable.mcgradle.base
+package club.ampthedev.mcgradle.base
 
 import groovy.lang.GroovyObjectSupport
 import org.gradle.api.GradleException
-import tk.amplifiable.mcgradle.base.utils.checkValidConstantProperty
+import club.ampthedev.mcgradle.base.utils.checkValidConstantProperty
 
 abstract class BaseExtension : GroovyObjectSupport() {
     var version = "1.8.9"

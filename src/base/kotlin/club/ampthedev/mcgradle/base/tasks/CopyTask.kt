@@ -1,8 +1,8 @@
-package tk.amplifiable.mcgradle.base.tasks
+package club.ampthedev.mcgradle.base.tasks
 
 import org.apache.commons.io.FileUtils
 import org.gradle.api.tasks.TaskAction
-import tk.amplifiable.mcgradle.base.utils.prepareDirectory
+import club.ampthedev.mcgradle.base.utils.prepareDirectory
 
 class CopyTask(type: TaskType = TaskType.OTHER, vararg deps: String) : InputOutputTask(type, *deps) {
     @TaskAction

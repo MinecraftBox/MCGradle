@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -9,7 +9,7 @@ import org.gradle.api.invocation.Gradle;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
-import tk.amplifiable.mcgradle.utils.Utils;
+import club.ampthedev.mcgradle.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;

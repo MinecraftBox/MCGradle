@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.subprojects;
+package club.ampthedev.mcgradle.tasks.subprojects;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileVisitDetails;
@@ -7,7 +7,7 @@ import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
-import tk.amplifiable.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.MCGradleConstants;
 
 import java.io.File;
 

@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.base.tasks
+package club.ampthedev.mcgradle.base.tasks
 
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile

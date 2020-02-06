@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.base.tasks
+package club.ampthedev.mcgradle.base.tasks
 
 import org.apache.commons.io.IOUtils
 import org.gradle.api.tasks.TaskAction

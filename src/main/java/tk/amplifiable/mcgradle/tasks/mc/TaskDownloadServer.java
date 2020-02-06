@@ -1,9 +1,9 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import com.google.gson.JsonObject;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
-import tk.amplifiable.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.MCGradleConstants;
 
 import java.io.File;
 

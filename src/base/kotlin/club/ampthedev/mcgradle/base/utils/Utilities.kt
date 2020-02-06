@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.base.utils
+package club.ampthedev.mcgradle.base.utils
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -7,7 +7,7 @@ import com.google.gson.JsonParser
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
-import tk.amplifiable.mcgradle.base.tasks.BaseTask
+import club.ampthedev.mcgradle.base.tasks.BaseTask
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection

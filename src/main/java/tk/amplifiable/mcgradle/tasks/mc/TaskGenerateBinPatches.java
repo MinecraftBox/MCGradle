@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle.tasks.mc;
+package club.ampthedev.mcgradle.tasks.mc;
 
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Splitter;
@@ -12,7 +12,7 @@ import lzma.streams.LzmaOutputStream;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.*;
-import tk.amplifiable.mcgradle.MCGradleConstants;
+import club.ampthedev.mcgradle.MCGradleConstants;
 
 import javax.annotation.Nonnull;
 import java.io.*;

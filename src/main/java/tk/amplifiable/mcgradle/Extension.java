@@ -1,4 +1,4 @@
-package tk.amplifiable.mcgradle;
+package club.ampthedev.mcgradle;
 
 import groovy.lang.GroovyObjectSupport;
 
