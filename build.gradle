@@ -29,7 +29,6 @@ sourceSets {
     base {}
     patch {}
     user {}
-    patchgen {}
 }
 
 dependencies {
@@ -41,14 +40,11 @@ dependencies {
 
     patchImplementation sourceSets.base.output
     patchImplementation sourceSets.base.compileClasspath
-    patchgenImplementation sourceSets.base.output
-    patchgenImplementation sourceSets.base.compileClasspath
     userImplementation sourceSets.base.output
     userImplementation sourceSets.base.compileClasspath
 
     implementation sourceSets.base.compileClasspath
     implementation sourceSets.patch.compileClasspath
-    implementation sourceSets.patchgen.compileClasspath
     implementation sourceSets.user.compileClasspath
 
     /*implementation gradleApi()
@@ -85,19 +81,16 @@ dependencies {
 
 jar {
     from sourceSets.patch.output
-    from sourceSets.patchgen.output
     from sourceSets.user.output
     from sourceSets.base.output
 
     dependsOn patchClasses
-    dependsOn patchgenClasses
     dependsOn userClasses
     dependsOn baseClasses
 }
 
 task sourcesJar(type: Jar) {
     from sourceSets.patch.allSource
-    from sourceSets.patchgen.allSource
     from sourceSets.user.allSource
     from sourceSets.base.allSource
     archiveClassifier = 'sources'
