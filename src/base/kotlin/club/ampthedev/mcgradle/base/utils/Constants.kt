@@ -17,6 +17,7 @@ const val MAPPING_CHANNEL = "@MAPPING_CHANNEL@"
 const val MAPPING_VERSION = "@MAPPING_VERSION@"
 const val RUN_DIRECTORY = "@RUN_DIRECTORY@"
 const val BUILD_DIR = "@BUILD_DIR@"
+const val CLIENT_JAR = "@CLIENT_JAR@"
 
 // Paths
 const val VERSIONS_DIRECTORY = "$CACHE_DIR/versions"

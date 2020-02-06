@@ -4,8 +4,9 @@ import groovy.lang.GroovyObjectSupport
 import org.gradle.api.GradleException
 import club.ampthedev.mcgradle.base.utils.checkValidConstantProperty
 import club.ampthedev.mcgradle.base.versioning.GitVersion
+import org.gradle.api.Project
 
-abstract class BaseExtension : GroovyObjectSupport() {
+abstract class BaseExtension(private val project: Project) : GroovyObjectSupport() {
     var version = "1.8.9"
     var mappingChannel = "stable"
     var mappingVersion = "22"
@@ -15,7 +16,7 @@ abstract class BaseExtension : GroovyObjectSupport() {
     var kotlinVersion: String? = null
     var gitVersion: Boolean = false
         set(v) {
-            BasePlugin.currentProject.version = GitVersion.gitVersion(BasePlugin.currentProject.projectDir)
+            project.version = GitVersion.gitVersion(project.projectDir)
             field = v
         }
     private val properties = hashMapOf<String, Any>()

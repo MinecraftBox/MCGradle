@@ -3,19 +3,18 @@ package club.ampthedev.mcgradle.base
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import club.ampthedev.mcgradle.base.utils.*
-import com.google.gson.GsonBuilder
 
 abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
     protected abstract val extension: T
+    protected lateinit var project: Project
 
     open fun preSetup(project: Project) {
-        currentProject = project
+        this.project = project
         project.extensions.add(EXTENSION_NAME, extension)
         project.configurations.create(CONFIGURATION_MC_DEPS)
     }
 
     open fun setup(project: Project) {
-        GsonBuilder().setPrettyPrinting().create()
         project.addReplacements(mapOf(
                 CACHE_DIR to "${project.gradle.gradleUserHomeDir.absolutePath}/caches/mcgradle",
                 PROJECT_DIR to project.projectDir.absolutePath,
@@ -23,7 +22,8 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
                 MAPPING_CHANNEL to extension.mappingChannel,
                 MAPPING_VERSION to extension.mappingVersion,
                 RUN_DIRECTORY to extension.runDirectory,
-                BUILD_DIR to project.buildDir.absolutePath
+                BUILD_DIR to project.buildDir.absolutePath,
+                CLIENT_JAR to "$CACHE_DIR/downloads/$MC_VERSION/client.jar"
         ))
 
         // Add dependencies
@@ -42,9 +42,5 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
         target.afterEvaluate {
             setup(it)
         }
-    }
-
-    companion object {
-        lateinit var currentProject: Project
     }
 }

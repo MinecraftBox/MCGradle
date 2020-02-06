@@ -12,6 +12,7 @@ import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
 import kotlin.reflect.KClass
 
 // version manifest data
@@ -117,8 +118,10 @@ fun Project.string(str: String, vararg args: Any?): String {
     val r = replacements[this]
     var result = str
     if (r != null) {
-        for (entry in r) {
-            result = result.replace(entry.key, entry.value)
+        while ("@[A-Z_]+@".toRegex().containsMatchIn(result)) {
+            for (entry in r) {
+                result = result.replace(entry.key, entry.value)
+            }
         }
     }
     return String.format(result, args)
@@ -143,3 +146,11 @@ fun checkValidConstantProperty(it: Any?) {
 fun <T> castTo(obj: Any) = obj as T // i hate unchecked warnings so this method is perfect for me - amp
 
 fun <T : Task> Project.getTask(name: String) = castTo<T>(project.tasks.getByName(name))
+
+fun File.hash(algorithm: String): String {
+    val md = MessageDigest.getInstance(algorithm)
+    val digest = md.digest(inputStream().use { f -> f.readBytes() })
+    return digest.fold("") { str, byte -> str + "%02x".format(byte) }
+}
+
+fun File.sha1() = hash("SHA-1")
