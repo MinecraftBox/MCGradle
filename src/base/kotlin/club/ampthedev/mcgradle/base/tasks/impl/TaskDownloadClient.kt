@@ -1,4 +1,4 @@
-package club.ampthedev.mcgradle.base.tasks.downloading
+package club.ampthedev.mcgradle.base.tasks.impl
 
 import club.ampthedev.mcgradle.base.tasks.VersionJsonDownloadTask
 import club.ampthedev.mcgradle.base.utils.CLIENT_JAR
@@ -9,7 +9,11 @@ import java.io.File
 
 open class TaskDownloadClient : VersionJsonDownloadTask() {
     @OutputFile
-    override val dest = File(project.string(CLIENT_JAR))
+    override var dest: File? = null
 
     override fun JsonObject.getDownloadObject(): JsonObject = getAsJsonObject("downloads").getAsJsonObject("client")
+
+    override fun setup() {
+        dest = File(project.string(CLIENT_JAR))
+    }
 }

@@ -1,5 +1,6 @@
 package club.ampthedev.mcgradle.base.utils
 
+import club.ampthedev.mcgradle.base.BasePlugin
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -43,6 +44,13 @@ private val validPropertyClasses = arrayListOf<Class<*>>(
 )
 private lateinit var versionManifestObj: VersionManifest
 private lateinit var versionJsonObj: JsonObject
+private val pluginInstances = hashMapOf<Project, BasePlugin<*>>()
+
+var Project.plugin: BasePlugin<*>
+    set(v) {
+        pluginInstances[this] = v
+    }
+    get() = pluginInstances[this] ?: error("Not set up yet")
 
 fun Project.getVersionManifest(): VersionManifest {
     if (!::versionManifestObj.isInitialized) {
@@ -132,10 +140,6 @@ fun prepareDirectory(dir: File?) {
         throw IOException("Couldn't create directory $dir")
     }
 }
-
-fun Project.task(name: String, task: Class<out BaseTask>): Task = tasks.create(name, task)
-
-fun Project.task(name: String, task: KClass<out BaseTask>) = task(name, task.java)
 
 fun checkValidConstantProperty(it: Any?) {
     if (it == null) throw GradleException("Properties cannot be null")

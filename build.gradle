@@ -15,7 +15,7 @@ repositories {
 }
 
 sourceSets {
-    main {
+    /*main {
         java {
             srcDirs = []
         }
@@ -25,7 +25,7 @@ sourceSets {
         resources {
             srcDirs = []
         }
-    }
+    }*/
     base {}
     patch {}
     user {}
@@ -37,6 +37,21 @@ dependencies {
     baseImplementation group: 'commons-io', name: 'commons-io', version: '2.6'
     baseImplementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
     baseImplementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.5.1.201910021850-r'
+    baseImplementation group: 'org.ow2.asm', name: 'asm', version: '7.2'
+    baseImplementation group: 'org.ow2.asm', name: 'asm-tree', version: '7.2'
+    baseImplementation group: 'org.ow2.asm', name: 'asm-util', version: '7.2'
+    baseImplementation group: 'org.ow2.asm', name: 'asm-commons', version: '7.2'
+    baseImplementation group: 'org.ow2.asm', name: 'asm-analysis', version: '7.2'
+    baseImplementation 'net.sf.opencsv:opencsv:2.3'
+    baseImplementation('net.minecraftforge.srg2source:Srg2Source:3.3-SNAPSHOT') {
+        exclude module: 'asm-debug-all'
+    }
+    baseImplementation('de.oceanlabs.mcp:mcinjector:3.4-SNAPSHOT') {
+        exclude module: 'asm-debug-all'
+    }
+    baseImplementation('net.md-5:SpecialSource:1.7.4') {
+        exclude module: 'asm-debug-all'
+    }
 
     patchImplementation sourceSets.base.output
     patchImplementation sourceSets.base.compileClasspath
@@ -47,7 +62,7 @@ dependencies {
     implementation sourceSets.patch.compileClasspath
     implementation sourceSets.user.compileClasspath
 
-    /*implementation gradleApi()
+    implementation gradleApi()
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.5.1.201910021850-r'
     compile group: 'com.google.guava', name: 'guava', version: '28.1-jre'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
@@ -76,7 +91,7 @@ dependencies {
     compile 'com.github.abrarsyed.jastyle:jAstyle:1.3'
     compile group: 'com.nothome', name: 'javaxdelta', version: '2.0.1'
     compile 'com.github.jponge:lzma-java:1.3'
-    compile 'io.github.java-diff-utils:java-diff-utils:4.4'*/
+    compile 'io.github.java-diff-utils:java-diff-utils:4.4'
 }
 
 jar {

@@ -11,7 +11,7 @@ abstract class InputOutputTask(type: TaskType = TaskType.OTHER, vararg deps: Str
     @OutputFile
     var output: File? = null
 
-    // Convenience classes for tasks
+    // Convenience methods for tasks
     // because ?. can get annoying.
     // Gradle already doesn't accept
     // null values for input and output.

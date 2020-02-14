@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import org.gradle.api.tasks.Input
 
 abstract class VersionJsonDownloadTask(type: TaskType = TaskType.OTHER, vararg deps: String) : BasicDownloadTask(type, *deps) {
-    override val url: String
+    override val url: String?
         @Input get() = project.getVersionJson().getDownloadObject().get("url").asString
 
     override val sha1: String?

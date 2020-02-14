@@ -10,10 +10,16 @@ enum class TaskType(val groupName: String) {
 }
 
 abstract class BaseTask(type: TaskType = TaskType.OTHER, vararg dependencies: String) : DefaultTask() {
+    constructor(vararg dependencies: String) : this(TaskType.OTHER, *dependencies)
+
     init {
         group = type.groupName
         for (dep in dependencies) {
             this.dependsOn(dep)
         }
+    }
+
+    open fun setup() {
+
     }
 }

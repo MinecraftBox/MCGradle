@@ -4,15 +4,16 @@ import club.ampthedev.mcgradle.base.utils.prepareDirectory
 import club.ampthedev.mcgradle.base.utils.sha1
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.net.URL
 
 abstract class BasicDownloadTask(type: TaskType = TaskType.OTHER, vararg deps: String) : BaseTask(type, *deps) {
-    protected abstract val url: String
-    protected abstract val dest: File
+    abstract val url: String?
+    abstract val dest: File?
     @Input
-    protected open val sha1: String? = null
+    open val sha1: String? = null
 
     protected open fun afterDownload() {}
 
@@ -38,7 +39,10 @@ abstract class BasicDownloadTask(type: TaskType = TaskType.OTHER, vararg deps: S
 
     @TaskAction
     fun startDownload() {
-        download(url, dest, sha1)
+        if (dest == null || url == null) {
+            throw GradleException("Task wasn't set up correctly")
+        }
+        download(url!!, dest!!, sha1)
         afterDownload()
     }
 }
