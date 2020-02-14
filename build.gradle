@@ -43,6 +43,7 @@ dependencies {
     baseImplementation group: 'org.ow2.asm', name: 'asm-commons', version: '7.2'
     baseImplementation group: 'org.ow2.asm', name: 'asm-analysis', version: '7.2'
     baseImplementation 'net.sf.opencsv:opencsv:2.3'
+    baseImplementation 'net.minecraftforge:fernflower:2.0-SNAPSHOT'
     baseImplementation('net.minecraftforge.srg2source:Srg2Source:3.3-SNAPSHOT') {
         exclude module: 'asm-debug-all'
     }

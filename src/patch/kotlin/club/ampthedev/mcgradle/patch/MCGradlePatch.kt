@@ -17,5 +17,6 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
         task(MERGE_JARS, TaskMergeJars::class)
         task(GENERATE_MAPPINGS, TaskGenerateMappings::class)
         task(DEOBF_JAR, TaskDeobf::class)
+        task(DECOMP, TaskDecomp::class)
     }
 }

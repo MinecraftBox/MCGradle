@@ -18,6 +18,7 @@ const val SPLIT_SERVER = "splitServer"
 const val MERGE_JARS = "mergeJars"
 const val GENERATE_MAPPINGS = "generateMappings"
 const val DEOBF_JAR = "deobfJar"
+const val DECOMP = "decompile"
 
 // Replacements
 const val CACHE_DIR = "@CACHE_DIR@"
@@ -55,6 +56,8 @@ const val EXCEPTOR_JSON = "$MAPPINGS_DIRECTORY/exceptor.json"
 const val TRANSFORMED_EXCEPTOR_JSON = "$VERSION_DIRECTORY/transformed.json"
 const val DEOBFED_JAR = "$VERSION_DIRECTORY/deobf.jar"
 const val DEOBF_TEMP_JAR = "$VERSION_DIRECTORY/deobf.temp.jar"
+const val DECOMP_JAR = "$VERSION_DIRECTORY/decomp.jar"
+const val DECOMP_TEMP = "$VERSION_DIRECTORY/decompiler"
 
 // URLs
 const val VERSION_MANIFEST_URL = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
