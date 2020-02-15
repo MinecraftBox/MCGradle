@@ -20,20 +20,11 @@ import java.io.File
 import java.util.zip.ZipFile
 
 class MCInjectorStruct {
-    var enclosingMethod: EnclosingMethod? = null
     var innerClasses: MutableList<InnerClass>? = null
 
-    data class EnclosingMethod(val desc: String, val name: String, val owner: String)
-
-    class InnerClass internal constructor(val inner_class: String, val outer_class: String, val inner_name: String, var access: String?, val start: String?) {
-        fun getAccess(): Int {
-            return access?.toInt(16) ?: 0
-        }
-
-        fun getStart(): Int {
-            return start?.toInt(10) ?: 0
-        }
-    }
+    class InnerClass internal constructor(
+        val inner_class: String
+    )
 }
 
 open class TaskDeobf : BaseTask(TaskType.OTHER, MERGE_JARS, GENERATE_MAPPINGS) {
@@ -62,7 +53,28 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, MERGE_JARS, GENERATE_MAPPINGS) {
     fun deobf() {
         val tempObfJar = File(project.string(DEOBF_TEMP_JAR))
         jar.deobfJar(tempObfJar, srg)
-        tempObfJar.applyExceptor(out, exceptorCfg)
+        if (project.newConfig) {
+            val clazz =
+                Class.forName("club.ampthedev.mcgradle.base.utils.MCInjectorStarter") // shadowjar changes package name
+            val method = clazz.getMethod(
+                "start",
+                File::class.java,
+                File::class.java,
+                File::class.java,
+                File::class.java,
+                File::class.java
+            )
+            method.invoke(
+                null,
+                    tempObfJar,
+                    out,
+                    project.mcgFile(EXCEPTIONS_TXT),
+                    project.mcgFile(ACCESS_TXT),
+                    project.mcgFile(CONSTRUCTORS_TXT)
+            )
+        } else {
+            tempObfJar.applyExceptor(out, exceptorCfg)
+        }
     }
 
     private fun File.deobfJar(out: File, srg: File) {
@@ -84,7 +96,18 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, MERGE_JARS, GENERATE_MAPPINGS) {
         json.bufferedWriter().use {
             it.write(Gson().toJson(struct))
         }
-        MCInjectorImpl.process(canonicalPath, out.canonicalPath, config.canonicalPath, null, null, 0, json.canonicalPath, false, true, LVTNaming.LVT)
+        MCInjectorImpl.process(
+            canonicalPath,
+            out.canonicalPath,
+            config.canonicalPath,
+            null,
+            null,
+            0,
+            json.canonicalPath,
+            false,
+            true,
+            LVTNaming.LVT
+        )
     }
 
     private fun File.removeUnknown(config: MutableMap<String, MCInjectorStruct>) {
@@ -120,7 +143,13 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, MERGE_JARS, GENERATE_MAPPINGS) {
         if (!::jar.isInitialized) jar = File(project.string(MERGED_JAR))
         if (!::srg.isInitialized) srg = File(project.string(NOTCH_SRG))
         if (!::exceptorCfg.isInitialized) exceptorCfg = File(project.string(SRG_EXC))
-        if (!::exceptorJson.isInitialized) exceptorJson = File(project.string(EXCEPTOR_JSON))
+        if (!::exceptorJson.isInitialized) {
+            exceptorJson = if (project.newConfig) {
+                exceptorCfg
+            } else {
+                File(project.string(EXCEPTOR_JSON))
+            }
+        }
         if (!::out.isInitialized) out = File(project.string(DEOBFED_JAR))
     }
 }

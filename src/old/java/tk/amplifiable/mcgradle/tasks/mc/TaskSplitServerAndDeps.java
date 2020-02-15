@@ -34,27 +34,22 @@ public class TaskSplitServerAndDeps extends DefaultTask {
     public void split() throws IOException {
         try (ZipFile file = new ZipFile(input)) {
             try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(output)))) {
-                try (ZipOutputStream zos2 = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(outputDeps)))) {
-                    for (ZipEntry s : Collections.list(file.entries())) {
-                        if (s.isDirectory()) continue;
-                        if (!(s.getName().endsWith(".class") || s.getName().endsWith(".java") || s.getName().startsWith("org/"))) {
-                            ZipEntry entry1 = new ZipEntry(s.getName());
-                            zos.putNextEntry(entry1);
-                            zos.write(ByteStreams.toByteArray(file.getInputStream(s)));
-                            continue;
-                        }
-                        if (s.getName().contains("/")) {
-                            if (!s.getName().startsWith("net/minecraft")) {
-                                ZipEntry entry1 = new ZipEntry(s.getName());
-                                zos2.putNextEntry(entry1);
-                                zos2.write(ByteStreams.toByteArray(file.getInputStream(s)));
-                                continue;
-                            }
-                        }
+                for (ZipEntry s : Collections.list(file.entries())) {
+                    if (s.isDirectory()) continue;
+                    if (!(s.getName().endsWith(".class") || s.getName().endsWith(".java") || s.getName().startsWith("org/"))) {
                         ZipEntry entry1 = new ZipEntry(s.getName());
                         zos.putNextEntry(entry1);
                         zos.write(ByteStreams.toByteArray(file.getInputStream(s)));
+                        continue;
                     }
+                    if (s.getName().contains("/")) {
+                        if (!s.getName().startsWith("net/minecraft")) {
+                            continue;
+                        }
+                    }
+                    ZipEntry entry1 = new ZipEntry(s.getName());
+                    zos.putNextEntry(entry1);
+                    zos.write(ByteStreams.toByteArray(file.getInputStream(s)));
                 }
             }
         }

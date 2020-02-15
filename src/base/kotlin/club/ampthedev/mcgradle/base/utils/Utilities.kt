@@ -8,13 +8,11 @@ import com.google.gson.JsonParser
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
-import club.ampthedev.mcgradle.base.tasks.BaseTask
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
-import kotlin.reflect.KClass
 
 // version manifest data
 data class Version(val id: String, val type: String, val url: String) // there's also time and releaseTime fields, but we don't need them
@@ -42,9 +40,29 @@ private val replacements = hashMapOf<Project, HashMap<String, String>>()
 private val validPropertyClasses = arrayListOf<Class<*>>(
         String::class.java
 )
-private lateinit var versionManifestObj: VersionManifest
-private lateinit var versionJsonObj: JsonObject
+private var versionManifestObj = hashMapOf<Project, VersionManifest>()
+private var versionJsonObj = hashMapOf<Project, JsonObject>()
 private val pluginInstances = hashMapOf<Project, BasePlugin<*>>()
+
+val Project.newDecomp: Boolean
+    get() {
+        val mcVer = plugin.extension.version
+        val parts = mcVer.split(".")
+        if (parts.size == 1) {
+            return false
+        }
+        return parts[1].toInt() > 11
+    }
+
+val Project.newConfig: Boolean
+    get() {
+        val mcVer = plugin.extension.version
+        val parts = mcVer.split(".")
+        if (parts.size == 1) {
+            return false
+        }
+        return parts[1].toInt() > 12
+    }
 
 var Project.plugin: BasePlugin<*>
     set(v) {
@@ -52,8 +70,15 @@ var Project.plugin: BasePlugin<*>
     }
     get() = pluginInstances[this] ?: error("Not set up yet")
 
+fun Project.reset() {
+    versionManifestObj.remove(this)
+    versionJsonObj.remove(this)
+    pluginInstances.remove(this)
+    replacements.remove(this)
+}
+
 fun Project.getVersionManifest(): VersionManifest {
-    if (!::versionManifestObj.isInitialized) {
+    if (!versionManifestObj.containsKey(this)) {
         // load version manifest
         val versionManifestFile = mcgFile(VERSION_MANIFEST_LOCATION)
         val versionManifestContent = try {
@@ -71,9 +96,9 @@ fun Project.getVersionManifest(): VersionManifest {
                 throw e
             }
         }
-        versionManifestObj = GSON.fromJson(versionManifestContent, VersionManifest::class.java)
+        versionManifestObj[this] = GSON.fromJson(versionManifestContent, VersionManifest::class.java)
     }
-    return versionManifestObj
+    return versionManifestObj[this]!!
 }
 
 fun getVersionData(manifest: VersionManifest, id: String): Version {
@@ -86,7 +111,7 @@ fun getVersionData(manifest: VersionManifest, id: String): Version {
 }
 
 fun Project.getVersionJson(): JsonObject {
-    if (!::versionJsonObj.isInitialized) {
+    if (versionJsonObj[this] == null) {
         // load version json
         val versionJsonFile = mcgFile(VERSION_DATA_LOCATION)
         val versionJsonContent = if (versionJsonFile.exists()) {
@@ -100,9 +125,9 @@ fun Project.getVersionJson(): JsonObject {
             versionJsonFile.bufferedWriter().use { it.write(result) }
             result
         }
-        versionJsonObj = JsonParser.parseString(versionJsonContent).asJsonObject
+        versionJsonObj[this] = JsonParser.parseString(versionJsonContent).asJsonObject
     }
-    return versionJsonObj
+    return versionJsonObj[this]!!
 }
 
 fun Project.addReplacement(name: String, value: String) {
@@ -149,7 +174,7 @@ fun checkValidConstantProperty(it: Any?) {
 @Suppress("UNCHECKED_CAST")
 fun <T> castTo(obj: Any) = obj as T // i hate unchecked warnings so this method is perfect for me - amp
 
-fun <T : Task> Project.getTask(name: String) = castTo<T>(project.tasks.getByName(name))
+operator fun <T : Task> Project.get(name: String) = castTo<T>(project.tasks.getByName(name))
 
 fun File.hash(algorithm: String): String {
     val md = MessageDigest.getInstance(algorithm)

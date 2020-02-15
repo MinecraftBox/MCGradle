@@ -1,7 +1,9 @@
 package club.ampthedev.mcgradle.base.tasks
 
-import org.apache.commons.io.IOUtils
+import com.google.common.io.ByteStreams
 import org.gradle.api.tasks.TaskAction
+import java.io.BufferedOutputStream
+import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -19,21 +21,25 @@ abstract class ZipEditTask(type: TaskType = TaskType.OTHER, vararg deps: String)
      */
     @TaskAction
     private fun editZip() {
-        ZipFile(getIn()).use { input ->
-            ZipOutputStream(FileOutputStream(getOut())).use { output ->
-                input.stream().forEach {
-                    if (keepEmptyDirectories && it.isDirectory) {
-                        output.putNextEntry(it) // zip directories don't need to be added/removed explicitly
-                    } else if (pattern.matches(it.name)) {
-                        val newEntry = ZipEntry(it.name)
-                        newEntry.lastModifiedTime = it.lastModifiedTime
-                        output.putNextEntry(it)
-                        output.write(edit(it, IOUtils.toByteArray(input.getInputStream(it))))
+        initTask()
+        ZipFile(getIn()).use { file ->
+            ZipOutputStream(BufferedOutputStream(FileOutputStream(getOut()))).use { output ->
+                for (s in file.entries()) {
+                    if (keepEmptyDirectories && s.isDirectory) {
+                        output.putNextEntry(s) // zip directories don't need to be added/removed explicitly
+                    } else if (s.shouldInclude()) {
+                        val newEntry = ZipEntry(s.name)
+                        output.putNextEntry(newEntry)
+                        output.write(edit(s, file.getInputStream(s).use { it.readBytes() }))
                     }
                 }
             }
         }
     }
+
+    protected open fun ZipEntry.shouldInclude() = pattern.matches(name)
+
+    protected open fun initTask() {}
 
     /**
      * Edits an entry's bytes and returns the modified version

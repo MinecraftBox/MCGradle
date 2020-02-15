@@ -3,6 +3,7 @@ package club.ampthedev.mcgradle.base.tasks.impl
 import au.com.bytecode.opencsv.CSVParser
 import au.com.bytecode.opencsv.CSVReader
 import club.ampthedev.mcgradle.base.tasks.BaseTask
+import club.ampthedev.mcgradle.base.tasks.impl.maps.TsrgContainer
 import club.ampthedev.mcgradle.base.utils.*
 import net.minecraftforge.srg2source.rangeapplier.SrgContainer
 import org.gradle.api.tasks.OutputDirectory
@@ -24,7 +25,7 @@ open class TaskGenerateMappings : BaseTask() {
             project.zipTree(file).visit(ExtractingFileVisitor(outputDirectory))
         }
 
-        val inSrgFile = File(project.string(JOINED_SRG))
+        val inSrgFile = File(project.string(if (project.newConfig) JOINED_TSRG else JOINED_SRG))
         val inExc = File(project.string(JOINED_EXC))
         val methodsCsv = File(project.string(METHODS_CSV))
         val fieldsCsv = File(project.string(FIELDS_CSV))
@@ -53,8 +54,8 @@ open class TaskGenerateMappings : BaseTask() {
             }
         }
 
-        val inSrg = SrgContainer().readSrg(inSrgFile)
-        inSrg.packageMap["club/ampthedev/mcgradle/base/annotations"] = "net/minecraftforge/fml/relauncher"
+        val inSrg = if (project.newConfig) TsrgContainer() else SrgContainer()
+        inSrg.readSrg(inSrgFile)
         for (f in arrayOf(notchToMcpFile, notchToSrgFile, srgToMcpFile, mcpToNotchFile, mcpToSrgFile, srgExcFile, mcpExcFile)) {
             prepareDirectory(f.parentFile)
         }
@@ -158,37 +159,48 @@ open class TaskGenerateMappings : BaseTask() {
         prepareDirectory(mcpExcFile.parentFile)
 
         val srgOut = srgExcFile.bufferedWriter()
-        val mcpOut = mcpExcFile.bufferedWriter()
 
-        val excLines = inExc.bufferedReader().use { it.readLines() }
+        if (!project.newConfig) {
+            val mcpOut = mcpExcFile.bufferedWriter()
 
-        var split: List<String>
-        for (line1 in excLines) {
-            srgOut.write(line1)
-            srgOut.newLine()
-            split = line1.split("=")
+            val excLines = inExc.bufferedReader().use { it.readLines() }
 
-            val sigIndex = split[0].indexOf('(')
-            val dotIndex = split[0].indexOf('.')
-            if (sigIndex == -1 || dotIndex == -1) {
-                mcpOut.write(line1)
+            var split: List<String>
+            for (line1 in excLines) {
+                srgOut.write(line1)
+                srgOut.newLine()
+                split = line1.split("=")
+
+                val sigIndex = split[0].indexOf('(')
+                val dotIndex = split[0].indexOf('.')
+                if (sigIndex == -1 || dotIndex == -1) {
+                    mcpOut.write(line1)
+                    mcpOut.newLine()
+                    continue
+                }
+
+                var name = split[0].substring(dotIndex + 1, sigIndex)
+                if (methods.containsKey(name)) {
+                    name = methods[name]!!
+                }
+                mcpOut.write(split[0].substring(0, dotIndex) + "." + name + split[0].substring(sigIndex) + "=" + split[1])
                 mcpOut.newLine()
-                continue
             }
 
-            var name = split[0].substring(dotIndex + 1, sigIndex)
-            if (methods.containsKey(name)) {
-                name = methods[name]!!
+            mcpOut.flush()
+            mcpOut.close()
+        } else {
+            val file1 = project.mcgFile(EXCEPTIONS_TXT)
+            val file2 = project.mcgFile(ACCESS_TXT)
+            val file3 = project.mcgFile(CONSTRUCTORS_TXT)
+            for (file in arrayOf(file1, file2, file3)) {
+                srgOut.write(file.bufferedReader().use { it.readText() })
+                srgOut.newLine()
             }
-            mcpOut.write(split[0].substring(0, dotIndex) + "." + name + split[0].substring(sigIndex) + "=" + split[1])
-            mcpOut.newLine()
         }
 
         srgOut.flush()
         srgOut.close()
-
-        mcpOut.flush()
-        mcpOut.close()
     }
 
     override fun setup() {

@@ -7,7 +7,7 @@ import org.gradle.api.Project
 import kotlin.reflect.KClass
 
 abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
-    protected abstract val extension: T
+    abstract val extension: T
     protected lateinit var project: Project
     private val tasks = hashMapOf<String, Pair<BaseTask, BaseTask.() -> Unit>>()
 
@@ -55,13 +55,22 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
                 "ext" to "zip"
         ))
 
-        project.dependencies.add(CONFIGURATION_MCP_MAPS, mapOf(
+        if (project.newConfig) {
+            project.dependencies.add(CONFIGURATION_MCP_MAPS, mapOf(
+                "group" to "de.oceanlabs.mcp",
+                "name" to "mcp_config",
+                "version" to extension.version,
+                "ext" to "zip"
+            ))
+        } else {
+            project.dependencies.add(CONFIGURATION_MCP_MAPS, mapOf(
                 "group" to "de.oceanlabs.mcp",
                 "name" to "mcp",
                 "version" to extension.version,
                 "classifier" to "srg",
                 "ext" to "zip"
-        ))
+            ))
+        }
 
         // Set up tasks
         for (task in tasks) {
@@ -71,6 +80,7 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
     }
 
     override fun apply(target: Project) {
+        target.reset()
         preSetup(target)
         target.afterEvaluate {
             setup(it)

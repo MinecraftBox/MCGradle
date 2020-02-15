@@ -82,7 +82,7 @@ public class TaskDeobf extends DefaultTask {
         File jsonTmp = new File(MCGradleConstants.CACHE_DIRECTORY, "jars/" + version + "/transformed.json");
         json = jsonTmp.getCanonicalPath();
         Files.write(Paths.get(json), new Gson().toJson(struct).getBytes(StandardCharsets.UTF_8));
-        MCInjectorImpl.process(in.getCanonicalPath(), out.getCanonicalPath(), config.getCanonicalPath(), null, null, 0, json, false, true, LVTNaming.LVT);
+        MCInjectorImpl.process(in.getCanonicalPath(), out.getCanonicalPath(), config.getCanonicalPath(), null, null, 0, json, false, true, LVTNaming.FERNFLOWER);
     }
 
     private void removeUnknown(File in, Map<String, MCInjectorStruct> config) throws IOException {
