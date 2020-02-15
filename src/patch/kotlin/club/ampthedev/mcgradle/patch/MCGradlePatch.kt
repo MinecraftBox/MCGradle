@@ -5,10 +5,8 @@ import club.ampthedev.mcgradle.base.tasks.TaskType
 import club.ampthedev.mcgradle.base.tasks.impl.*
 import club.ampthedev.mcgradle.base.utils.*
 import club.ampthedev.mcgradle.patch.tasks.TaskCopySource
-import club.ampthedev.mcgradle.patch.utils.APPLY_MOD_PATCHES
-import club.ampthedev.mcgradle.patch.utils.COPY_SOURCES
-import club.ampthedev.mcgradle.patch.utils.MOD_PATCHED_JAR
-import club.ampthedev.mcgradle.patch.utils.SETUP
+import club.ampthedev.mcgradle.patch.tasks.TaskGeneratePatches
+import club.ampthedev.mcgradle.patch.utils.*
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
 import java.io.File
@@ -44,6 +42,7 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
         task(DOWNLOAD_ASSET_INDEX, TaskDownloadAssetIndex::class)
         task(DOWNLOAD_ASSETS, TaskDownloadAssets::class)
         task(COPY_SOURCES, TaskCopySource::class)
+        task(GENERATE_PATCHES, TaskGeneratePatches::class)
         val setupTask = project.task(SETUP)
         setupTask.group = TaskType.MAIN.groupName
         setupTask.dependsOn(COPY_SOURCES, DOWNLOAD_NATIVES, DOWNLOAD_ASSETS)
