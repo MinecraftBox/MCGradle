@@ -43,7 +43,7 @@ open class TaskApplyPatches : ZipEditTask() {
                 val provider = ContextProvider(content)
                 val patch = ContextualPatch.create(patchFile.bufferedReader().use { it.readText() }, provider)
                     .setAccessC14N(true)
-                val errors = patch.patch(true)
+                val errors = patch.patch(false)
 
                 var error: Throwable? = null
                 for (rep in errors) {
@@ -61,7 +61,9 @@ open class TaskApplyPatches : ZipEditTask() {
                 if (error != null) {
                     throw error
                 }
+                content = provider.getAsString()
             }
+            return content.toByteArray()
         }
         return bytes
     }
@@ -70,7 +72,7 @@ open class TaskApplyPatches : ZipEditTask() {
         private var d = file.lines()
 
         override fun getData(target: String?): MutableList<String> {
-            val out = ArrayList<String>(d.size * 5)
+            val out = ArrayList<String>(d.size + 5)
             out.addAll(d)
             return out
         }
@@ -78,6 +80,8 @@ open class TaskApplyPatches : ZipEditTask() {
         override fun setData(target: String?, data: MutableList<String>) {
             d = data
         }
+
+        fun getAsString() = d.joinToString("\n")
     }
 
     companion object {

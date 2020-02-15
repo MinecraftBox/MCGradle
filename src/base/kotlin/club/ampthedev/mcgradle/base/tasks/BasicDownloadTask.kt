@@ -17,26 +17,6 @@ abstract class BasicDownloadTask(type: TaskType = TaskType.OTHER, vararg deps: S
 
     protected open fun afterDownload() {}
 
-    private fun download(url: String, dest: File, sha1: String? = null, tries: Int = 0) {
-        if (sha1 != null && dest.exists()) {
-            if (sha1.equals(dest.sha1(), ignoreCase = true)) return
-        }
-        if (tries > 10) {
-            throw GradleException("Failed to download $url")
-        }
-        val conn = URL(url).openConnection()
-        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0")
-        prepareDirectory(dest.parentFile)
-        conn.getInputStream().use {
-            dest.outputStream().use { out ->
-                out.write(it.readBytes())
-            }
-        }
-        if (sha1 != null) {
-            download(url, dest, sha1, tries + 1)
-        }
-    }
-
     @TaskAction
     fun startDownload() {
         if (dest == null || url == null) {
@@ -44,5 +24,27 @@ abstract class BasicDownloadTask(type: TaskType = TaskType.OTHER, vararg deps: S
         }
         download(url!!, dest!!, sha1)
         afterDownload()
+    }
+
+    companion object {
+        fun download(url: String, dest: File, sha1: String? = null, tries: Int = 0) {
+            if (sha1 != null && dest.exists()) {
+                if (sha1.equals(dest.sha1(), ignoreCase = true)) return
+            }
+            if (tries > 10) {
+                throw GradleException("Failed to download $url")
+            }
+            val conn = URL(url).openConnection()
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0")
+            prepareDirectory(dest.parentFile)
+            conn.getInputStream().use {
+                dest.outputStream().use { out ->
+                    out.write(it.readBytes())
+                }
+            }
+            if (sha1 != null) {
+                download(url, dest, sha1, tries + 1)
+            }
+        }
     }
 }

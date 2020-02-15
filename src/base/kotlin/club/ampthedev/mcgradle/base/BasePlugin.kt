@@ -73,9 +73,22 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
         }
 
         // Set up tasks
+        val setUp = hashMapOf<String, Boolean>()
+
         for (task in tasks) {
-            task.value.first.setup()
-            task.value.second(task.value.first)
+            task.value.setupTask(setUp)
+        }
+    }
+
+    private fun Pair<BaseTask, BaseTask.() -> Unit>.setupTask(setupTasks: MutableMap<String, Boolean>) {
+        if (setupTasks[first.name] != true) {
+            for (t in first.dependsOn) {
+                if (t is String) {
+                    tasks[t]?.setupTask(setupTasks)
+                }
+            }
+            first.setup()
+            second(first)
         }
     }
 

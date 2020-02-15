@@ -21,6 +21,9 @@ const val DEOBF_JAR = "deobfJar"
 const val DECOMP = "decompile"
 const val APPLY_MCP_PATCHES = "applyMcpPatches"
 const val SOURCE_DEOBF = "sourceDeobf"
+const val DOWNLOAD_NATIVES = "downloadNatives"
+const val DOWNLOAD_ASSET_INDEX = "downloadAssetIndex"
+const val DOWNLOAD_ASSETS = "downloadAssets"
 
 // Replacements
 const val CACHE_DIR = "@CACHE_DIR@"
@@ -69,6 +72,8 @@ const val EXCEPTIONS_TXT = "$MAPPINGS_DIRECTORY/config/exceptions.txt"
 const val ACCESS_TXT = "$MAPPINGS_DIRECTORY/config/access.txt"
 const val CONSTRUCTORS_TXT = "$MAPPINGS_DIRECTORY/config/constructors.txt"
 const val SOURCE_MAPPED_JAR = "$VERSION_DIRECTORY/sourceMapped.jar"
+const val NATIVES_DIRECTORY = "$VERSION_DIRECTORY/natives"
+const val ASSETS_DIRECTORY = "$CACHE_DIR/assets"
 
 // URLs
 const val VERSION_MANIFEST_URL = "https://launchermeta.mojang.com/mc/game/version_manifest.json"

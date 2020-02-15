@@ -46,7 +46,7 @@ object GitVersion {
         }
         headId.name.substring(0, 7) + "-SNAPSHOT"
     } catch (e: Exception) {
-        "(unknown)"
+        "unknown"
     }
 
     private fun updateMap(map: MutableMap<String, RefWithTagName>, comparator: RefComparator, id: ObjectId, ref: RefWithTagName) {
