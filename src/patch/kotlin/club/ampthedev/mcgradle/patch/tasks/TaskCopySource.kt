@@ -23,6 +23,9 @@ open class TaskCopySource : BaseTask(APPLY_MOD_PATCHES) {
     val options = hashMapOf<String, String>()
 
     @Input
+    lateinit var properties: Map<String, Any>
+
+    @Input
     val template =
         TaskCopySource::class.java.getResourceAsStream("/classes/Start.java").bufferedReader().use { it.readText() }
 
@@ -54,6 +57,28 @@ open class TaskCopySource : BaseTask(APPLY_MOD_PATCHES) {
         startClass.writer().use {
             it.write(source)
         }
+
+        var propertiesSource = """
+            package club.ampthedev.mcgradle;
+            
+            public final class Properties {
+                private Properties() {
+                }
+
+
+        """.trimIndent()
+
+        for (property in properties) {
+            propertiesSource += "    public static final String ${property.key} = \"${StringEscapeUtils.escapeJava(
+                property.value.toString()
+            )}\";\n"
+        }
+        propertiesSource += "}\n"
+        val propertiesSourceFile = File(sourceDir, "club/ampthedev/mcgradle/Properties.java")
+        prepareDirectory(propertiesSourceFile.parentFile)
+        propertiesSourceFile.bufferedWriter().use {
+            it.write(propertiesSource)
+        }
     }
 
     override fun setup() {
@@ -64,6 +89,7 @@ open class TaskCopySource : BaseTask(APPLY_MOD_PATCHES) {
             val task = project.tasks.getByName(APPLY_MOD_PATCHES) as TaskApplyPatches
             sourceJar = task.output!!
         }
+        if (!::properties.isInitialized) properties = project.plugin.extension.properties
         options["runDirectory"] = project.string(RUN_DIRECTORY)
         options["nativeDirectory"] = project.string(NATIVES_DIRECTORY)
         options["clientMainClass"] = project.string(project.plugin.extension.clientMainClass)

@@ -19,7 +19,7 @@ abstract class BaseExtension(private val project: Project) : GroovyObjectSupport
             project.version = GitVersion.gitVersion(project.projectDir)
             field = v
         }
-    private val properties = hashMapOf<String, Any>()
+    val properties = hashMapOf<String, Any>()
 
     fun gitVersion(gitVersion: Boolean) {
         this.gitVersion = gitVersion

@@ -39,7 +39,7 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
             output = File(temporaryDir, MOD_PATCHED_JAR)
             patches = extension.patchDir
             prepareDirectory(patches)
-            // dependsOn(SOURCE_DEOBF)
+            dependsOn(SOURCE_DEOBF)
         }
         task(DOWNLOAD_ASSET_INDEX, TaskDownloadAssetIndex::class)
         task(DOWNLOAD_ASSETS, TaskDownloadAssets::class)
