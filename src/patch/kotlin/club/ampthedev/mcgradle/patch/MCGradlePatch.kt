@@ -9,6 +9,8 @@ import club.ampthedev.mcgradle.patch.tasks.TaskGeneratePatches
 import club.ampthedev.mcgradle.patch.utils.*
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.tasks.Copy
+import org.gradle.jvm.tasks.Jar
 import java.io.File
 
 class MCGradlePatch : BasePlugin<PatchExtension>() {
@@ -28,7 +30,7 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
             output = File(project.string(PATCHED_JAR))
             patches = File(project.string(if (project.newConfig) MCP_PATCHES_NEW else MCP_PATCHES))
             mcpPatch = true
-            dependsOn(DECOMP)
+            // dependsOn(DECOMP)
         }
         task(DOWNLOAD_NATIVES, TaskDownloadNatives::class)
         task(SOURCE_DEOBF, TaskSourceDeobf::class)
@@ -43,6 +45,7 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
         task(DOWNLOAD_ASSETS, TaskDownloadAssets::class)
         task(COPY_SOURCES, TaskCopySource::class)
         task(GENERATE_PATCHES, TaskGeneratePatches::class)
+        task(RECOMPILE_CLEAN_TASK, TaskRecompile::class)
         val setupTask = project.task(SETUP)
         setupTask.group = TaskType.MAIN.groupName
         setupTask.dependsOn(COPY_SOURCES, DOWNLOAD_NATIVES, DOWNLOAD_ASSETS)

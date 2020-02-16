@@ -24,6 +24,7 @@ const val SOURCE_DEOBF = "sourceDeobf"
 const val DOWNLOAD_NATIVES = "downloadNatives"
 const val DOWNLOAD_ASSET_INDEX = "downloadAssetIndex"
 const val DOWNLOAD_ASSETS = "downloadAssets"
+const val RECOMPILE_CLEAN_TASK = "recompileClean"
 
 // Replacements
 const val CACHE_DIR = "@CACHE_DIR@"
@@ -74,6 +75,7 @@ const val CONSTRUCTORS_TXT = "$MAPPINGS_DIRECTORY/config/constructors.txt"
 const val SOURCE_MAPPED_JAR = "$VERSION_DIRECTORY/sourceMapped.jar"
 const val NATIVES_DIRECTORY = "$VERSION_DIRECTORY/natives"
 const val ASSETS_DIRECTORY = "$CACHE_DIR/assets"
+const val VANILLA_RECOMPILED_JAR = "$VERSION_DIRECTORY/recompiled.jar"
 
 // URLs
 const val VERSION_MANIFEST_URL = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
