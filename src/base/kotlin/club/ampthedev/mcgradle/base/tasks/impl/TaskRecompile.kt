@@ -92,27 +92,29 @@ open class TaskRecompile : BaseTask(SOURCE_DEOBF) {
         }
     }
 
-    private fun updateExtDirs() {
-        val current = System.getProperty("java.ext.dirs")
-        val new = StringBuilder()
-        val parts = current.split(File.pathSeparator)
-        if (parts.isNotEmpty()) {
-            val lastPart = parts[parts.size - 1]
-            for (part in parts) {
-                if (part != "/System/Library/Java/Extensions") {
-                    new.append(part)
-                    if (part != lastPart) {
-                        new.append(File.pathSeparator)
-                    }
-                }
-            }
-        }
-        System.setProperty("java.ext.dirs", new.toString())
-    }
-
     override fun setup() {
         if (!::sourceJar.isInitialized) sourceJar = project.mcgFile(SOURCE_MAPPED_JAR)
         if (!::outputJar.isInitialized) outputJar = project.mcgFile(VANILLA_RECOMPILED_JAR)
         if (!::classpath.isInitialized) classpath = project.configurations.getByName(CONFIGURATION_MC_DEPS)
+    }
+
+    companion object {
+        fun updateExtDirs() {
+            val current = System.getProperty("java.ext.dirs")
+            val new = StringBuilder()
+            val parts = current.split(File.pathSeparator)
+            if (parts.isNotEmpty()) {
+                val lastPart = parts[parts.size - 1]
+                for (part in parts) {
+                    if (part != "/System/Library/Java/Extensions") {
+                        new.append(part)
+                        if (part != lastPart) {
+                            new.append(File.pathSeparator)
+                        }
+                    }
+                }
+            }
+            System.setProperty("java.ext.dirs", new.toString())
+        }
     }
 }

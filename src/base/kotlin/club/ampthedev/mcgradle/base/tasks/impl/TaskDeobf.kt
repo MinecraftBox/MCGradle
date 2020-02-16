@@ -28,7 +28,7 @@ class MCInjectorStruct {
     )
 }
 
-open class TaskDeobf : BaseTask(TaskType.OTHER, MERGE_JARS, GENERATE_MAPPINGS) {
+open class TaskDeobf : BaseTask(TaskType.OTHER) {
     @InputFile
     lateinit var fieldCsv: File
 

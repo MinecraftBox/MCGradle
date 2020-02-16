@@ -20,14 +20,13 @@ open class TaskCopySource : BaseTask(APPLY_MOD_PATCHES) {
     lateinit var outputDir: File
 
     @Input
-    val options = hashMapOf<String, String>()
-
-    @Input
     lateinit var properties: Map<String, Any>
 
     @Input
-    val template =
-        TaskCopySource::class.java.getResourceAsStream("/classes/Start.java").bufferedReader().use { it.readText() }
+    fun getOptions() = StartSourceGenerator.options
+
+    @Input
+    fun getTemplate() = StartSourceGenerator.template
 
     @TaskAction
     fun copy() {
@@ -50,12 +49,9 @@ open class TaskCopySource : BaseTask(APPLY_MOD_PATCHES) {
         }
         val startClass = File(sourceDir, "club/ampthedev/mcgradle/Start.java")
         prepareDirectory(startClass.parentFile)
-        var source = template
-        for (option in options) {
-            source = source.replace("\${${option.key}}", StringEscapeUtils.escapeJava(option.value))
-        }
+
         startClass.writer().use {
-            it.write(source)
+            it.write(StartSourceGenerator.generate())
         }
 
         var propertiesSource = """
@@ -90,11 +86,5 @@ open class TaskCopySource : BaseTask(APPLY_MOD_PATCHES) {
             sourceJar = task.output!!
         }
         if (!::properties.isInitialized) properties = project.plugin.extension.properties
-        options["runDirectory"] = project.string(RUN_DIRECTORY)
-        options["nativeDirectory"] = project.string(NATIVES_DIRECTORY)
-        options["clientMainClass"] = project.string(project.plugin.extension.clientMainClass)
-        options["serverMainClass"] = project.string(project.plugin.extension.serverMainClass)
-        options["assetsDirectory"] = project.string(ASSETS_DIRECTORY)
-        options["assetIndex"] = project.getVersionJson().getAsJsonObject("assetIndex")["id"].asString
     }
 }

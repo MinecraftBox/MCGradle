@@ -11,6 +11,8 @@ import club.ampthedev.mcgradle.patch.tasks.TaskGeneratePatches
 import club.ampthedev.mcgradle.patch.utils.*
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.tasks.Jar
 import java.io.File
 
@@ -24,7 +26,9 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
         task(SPLIT_SERVER, TaskSplitServer::class)
         task(MERGE_JARS, TaskMergeJars::class)
         task(GENERATE_MAPPINGS, TaskGenerateMappings::class)
-        task(DEOBF_JAR, TaskDeobf::class)
+        task(DEOBF_JAR, TaskDeobf::class) {
+            dependsOn(MERGE_JARS, GENERATE_MAPPINGS)
+        }
         task(DECOMP, TaskDecomp::class)
         task(APPLY_MCP_PATCHES, TaskApplyPatches::class) {
             input = File(project.string(DECOMP_JAR))
@@ -65,7 +69,7 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
 
     override fun setup(project: Project) {
         super.setup(project)
-        project.tasks.getByName("assemble").dependsOn(GENERATE_ARTIFACTS)
+        project.tasks.getByName("jar").finalizedBy(GENERATE_ARTIFACTS)
         val javaPlugin = project.convention.getPlugin(JavaPluginConvention::class.java)
         val sourceSets = javaPlugin.sourceSets
         val main = extension.sourceSet ?: sourceSets.getByName("main")

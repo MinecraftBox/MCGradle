@@ -13,6 +13,8 @@ abstract class BaseExtension(private val project: Project) : GroovyObjectSupport
     var runDirectory = "run"
     var clientMainClass = "net.minecraft.client.main.Main"
     var serverMainClass = "net.minecraft.server.dedicated.DedicatedServer"
+    var jvmargs = arrayListOf<String>()
+    var args = arrayListOf<String>()
     var kotlinVersion: String? = null
     var gitVersion: Boolean = false
         set(v) {

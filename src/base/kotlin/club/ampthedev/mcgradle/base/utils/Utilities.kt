@@ -147,14 +147,24 @@ fun Project.addReplacements(replacements: Map<String, String>) {
     }
 }
 
+fun Project.hasReplacement(replacement: String): Boolean {
+    return (replacements[this] ?: return false).containsKey(replacement)
+}
+
 fun Project.string(str: String, vararg args: Any?): String {
     val r = replacements[this]
     var result = str
     if (r != null) {
-        while ("@[A-Z_]+@".toRegex().containsMatchIn(result)) {
-            for (entry in r) {
-                result = result.replace(entry.key, entry.value)
+        val regex = "@[A-Z_]+@".toPattern()
+        while (true) {
+            val matcher = regex.matcher(result)
+            if (!matcher.find()) {
+                break
             }
+            do {
+                val key = matcher.group()
+                result = result.replace(key, r[key] ?: error("Invalid replacement $key"))
+            } while (matcher.find())
         }
     }
     return String.format(result, args)

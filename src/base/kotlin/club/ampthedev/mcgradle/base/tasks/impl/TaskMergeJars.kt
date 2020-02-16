@@ -278,9 +278,9 @@ open class TaskMergeJars : BaseTask(SPLIT_SERVER, DOWNLOAD_CLIENT) {
     }
 
     override fun setup() {
-        clientJar = File(project.string(CLIENT_JAR))
-        serverJar = File(project.string(SPLIT_SERVER_JAR))
-        mergedJar = File(project.string(MERGED_JAR))
+        if (!::clientJar.isInitialized) clientJar = File(project.string(CLIENT_JAR))
+        if (!::serverJar.isInitialized) serverJar = File(project.string(SPLIT_SERVER_JAR))
+        if (!::mergedJar.isInitialized) mergedJar = File(project.string(MERGED_JAR))
     }
 
     companion object {

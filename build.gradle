@@ -83,11 +83,11 @@ dependencies {
     }
 
     patchImplementation sourceSets.main.output
-    patchImplementation sourceSets.main.runtimeClasspath
+    patchImplementation sourceSets.main.compileClasspath
     userImplementation sourceSets.main.output
-    userImplementation sourceSets.main.runtimeClasspath
+    userImplementation sourceSets.main.compileClasspath
     newdecompImplementation sourceSets.main.output
-    newdecompImplementation sourceSets.main.runtimeClasspath
+    newdecompImplementation sourceSets.main.compileClasspath
 
     /*implementation sourceSets.base.compileClasspath
     implementation sourceSets.patch.compileClasspath

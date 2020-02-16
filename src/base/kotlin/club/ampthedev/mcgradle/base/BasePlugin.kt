@@ -20,8 +20,10 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
         project.configurations.create(CONFIGURATION_MCP_DATA)
     }
 
-    fun <T : BaseTask> task(name: String, task: KClass<T>, setup: T.() -> Unit = {}) {
-        tasks[name] = Pair(project.tasks.create(name, task.java), castTo(setup))
+    fun <T : BaseTask> task(name: String, task: KClass<T>, setup: T.() -> Unit = {}): T {
+        val t = project.tasks.create(name, task.java)
+        tasks[name] = Pair(t, castTo(setup))
+        return t
     }
 
     open fun setup(project: Project) {
@@ -38,6 +40,8 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
                 RUN_DIRECTORY to extension.runDirectory,
                 BUILD_DIR to project.buildDir.absolutePath
         ))
+
+        StartSourceGenerator.init(project)
 
         // Add dependencies
         for (element in project.getVersionJson().getAsJsonArray("libraries")) {
