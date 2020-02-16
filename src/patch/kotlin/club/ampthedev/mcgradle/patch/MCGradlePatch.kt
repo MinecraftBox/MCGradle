@@ -4,10 +4,7 @@ import club.ampthedev.mcgradle.base.BasePlugin
 import club.ampthedev.mcgradle.base.tasks.TaskType
 import club.ampthedev.mcgradle.base.tasks.impl.*
 import club.ampthedev.mcgradle.base.utils.*
-import club.ampthedev.mcgradle.patch.tasks.TaskCopySource
-import club.ampthedev.mcgradle.patch.tasks.TaskGenerateArtifacts
-import club.ampthedev.mcgradle.patch.tasks.TaskGenerateBinPatches
-import club.ampthedev.mcgradle.patch.tasks.TaskGeneratePatches
+import club.ampthedev.mcgradle.patch.tasks.*
 import club.ampthedev.mcgradle.patch.utils.*
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
@@ -37,6 +34,7 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
             mcpPatch = true
             dependsOn(DECOMP)
         }
+        task(GEN_START, TaskGenStart::class)
         task(DOWNLOAD_NATIVES, TaskDownloadNatives::class)
         task(SOURCE_DEOBF, TaskSourceDeobf::class)
         task(APPLY_MOD_PATCHES, TaskApplyPatches::class) {
@@ -59,12 +57,33 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
         }
         task(GENERATE_BIN_PATCHES, TaskGenerateBinPatches::class)
         task(GENERATE_ARTIFACTS, TaskGenerateArtifacts::class)
+        task(GEN_CLIENT_RUN, TaskCreateRunConfig::class) {
+            configName = "Minecraft Client"
+            mainClass = "club.ampthedev.mcgradle.Start"
+            vmOptions.addAll(extension.jvmargs)
+            args.addAll(extension.args)
+            workingDirectory = File(extension.runDirectory)
+            beforeRunTasks.add(GEN_START)
+        }
+        task(GEN_SERVER_RUN, TaskCreateRunConfig::class) {
+            configName = "Minecraft Server"
+            mainClass = "club.ampthedev.mcgradle.Start"
+            vmOptions.addAll(extension.jvmargs)
+            args.add("--server")
+            args.addAll(extension.args)
+            workingDirectory = File(extension.runDirectory)
+            beforeRunTasks.add(GEN_START)
+        }
+        val genConfigs = project.task(GEN_RUNS)
+        genConfigs.group = TaskType.MAIN.groupName
+        genConfigs.dependsOn(GEN_CLIENT_RUN, GEN_SERVER_RUN)
         val setupTask = project.task(SETUP_DEV)
         setupTask.group = TaskType.MAIN.groupName
-        setupTask.dependsOn(COPY_SOURCES, DOWNLOAD_NATIVES, DOWNLOAD_ASSETS)
+        setupTask.dependsOn(COPY_SOURCES, GEN_START, DOWNLOAD_NATIVES, DOWNLOAD_ASSETS)
         val setupTask2 = project.task(SETUP_CI)
         setupTask2.group = TaskType.MAIN.groupName
-        setupTask2.dependsOn(COPY_SOURCES)
+        setupTask2.dependsOn(COPY_SOURCES, GEN_START)
+        project.tasks.getByName("idea").dependsOn(GEN_RUNS)
     }
 
     override fun setup(project: Project) {

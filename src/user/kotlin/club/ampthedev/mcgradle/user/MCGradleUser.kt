@@ -1,6 +1,8 @@
 package club.ampthedev.mcgradle.user
 
 import club.ampthedev.mcgradle.base.BasePlugin
+import club.ampthedev.mcgradle.base.tasks.BaseTask
+import club.ampthedev.mcgradle.base.tasks.TaskType
 import club.ampthedev.mcgradle.base.tasks.impl.*
 import club.ampthedev.mcgradle.base.utils.*
 import club.ampthedev.mcgradle.user.tasks.TaskApplyBinaryPatches
@@ -9,6 +11,7 @@ import club.ampthedev.mcgradle.user.tasks.TaskInjectClasses
 import club.ampthedev.mcgradle.user.utils.*
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.Task
 import java.io.File
 import java.util.*
 import java.util.zip.ZipFile
@@ -57,49 +60,30 @@ class MCGradleUser : BasePlugin<UserExtension>() {
             srg = project.mcgFile(NOTCH_MCP)
         }
         task(GEN_START, TaskGenerateStartLib::class)
+        task(GEN_CLIENT_RUN, TaskCreateRunConfig::class) {
+            configName = "Minecraft Client"
+            mainClass = "club.ampthedev.mcgradle.Start"
+            vmOptions.addAll(extension.jvmargs)
+            args.addAll(extension.args)
+            workingDirectory = File(extension.runDirectory)
+            beforeRunTasks.add(GEN_START)
+        }
+        task(GEN_SERVER_RUN, TaskCreateRunConfig::class) {
+            configName = "Minecraft Server"
+            mainClass = "club.ampthedev.mcgradle.Start"
+            vmOptions.addAll(extension.jvmargs)
+            args.add("--server")
+            args.addAll(extension.args)
+            workingDirectory = File(extension.runDirectory)
+            beforeRunTasks.add(GEN_START)
+        }
+        val genConfigs = project.task(GEN_RUNS)
+        genConfigs.group = TaskType.MAIN.groupName
+        genConfigs.dependsOn(GEN_CLIENT_RUN, GEN_SERVER_RUN)
+        project.tasks.getByName("idea").dependsOn(GEN_RUNS)
         task(DOWNLOAD_NATIVES, TaskDownloadNatives::class)
         task(DOWNLOAD_ASSET_INDEX, TaskDownloadAssetIndex::class)
         task(DOWNLOAD_ASSETS, TaskDownloadAssets::class)
-        /*
-        val mcpDeobf = task(MCP_DEOBF, TaskDeobf::class) {
-            jar = inject.output
-            out = File(temporaryDir, "deobf.jar")
-            srg = project.mcgFile(NOTCH_MCP)
-        }
-        mcpDeobf.dependsOn(INJECT_CLASSES)
-         */
-        /*task(GENERATE_MAPPINGS, TaskGenerateMappings::class)
-        task(DOWNLOAD_CLIENT, TaskDownloadClient::class)
-        task(DOWNLOAD_SERVER, TaskDownloadServer::class)
-        task(SPLIT_SERVER, TaskSplitServer::class)
-        task(MERGE_JARS, TaskMergeJars::class)
-        val binpatchClient = task(BINPATCH_CLIENT, TaskApplyBinaryPatches::class) {
-            input = project.mcgFile(CLIENT_JAR)
-            output = File(temporaryDir, "patched.jar")
-            patchLzmaPath = "binpatches.lzma"
-            patchRoot = "client"
-            dependsOn(DOWNLOAD_CLIENT)
-        }
-        val binpatchServer = task(BINPATCH_SERVER, TaskApplyBinaryPatches::class) {
-            input = project.mcgFile(SPLIT_SERVER_JAR)
-            output = File(temporaryDir, "patched.jar")
-            patchLzmaPath = "binpatches.dev.lzma"
-            patchRoot = "server"
-            dependsOn(SPLIT_SERVER)
-        }
-        val mergePatched = task(MERGE_PATCHED_JARS, TaskMergeJars::class) {
-            clientJar = binpatchClient.output!!
-            serverJar = binpatchServer.output!!
-            mergedJar = File(temporaryDir, "merged.jar")
-        }
-        mergePatched.dependsOn(BINPATCH_CLIENT, BINPATCH_SERVER)
-        val inject = task(INJECT_CLASSES, TaskInjectClasses::class)
-        val mcpDeobf = task(MCP_DEOBF, TaskDeobf::class) {
-            jar = inject.output
-            out = File(temporaryDir, "deobf.jar")
-            srg = project.mcgFile(NOTCH_MCP)
-        }
-        mcpDeobf.dependsOn(INJECT_CLASSES)*/
     }
 
     override fun setup(project: Project) {
@@ -137,15 +121,11 @@ class MCGradleUser : BasePlugin<UserExtension>() {
                 VANILLA_REPO
             } else MOD_REPO
         )
-        project.addReplacement(
-            RUN_STATE_HASH,
-            Objects.hash(extension.clientMainClass, extension.serverMainClass, extension.runDirectory).toString()
-        )
         super.setup(project)
 
         project.repositories.maven { it.url = project.mcgFile(REPO).toURI() }
 
-        project.dependencies.add("compile", project.files(project.mcgFile(START_LIB_LOCATION)))
+        project.dependencies.add("compile", project.files(castTo<TaskGenerateStartLib>(project.tasks.getByName(GEN_START)).library))
         val recompFile = project.mcgFile(DECOMP_BIN)
         when {
             recompFile.exists() -> {

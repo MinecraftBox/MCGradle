@@ -5,7 +5,6 @@ import club.ampthedev.mcgradle.base.utils.VERSION_DIRECTORY
 const val MOD_JAR = "@MOD_JAR@"
 const val MOD_HASH = "@MOD_HASH@"
 const val REPO = "@REPO@"
-const val RUN_STATE_HASH = "@RUN_STATE_HASH@"
 
 val MCBIN_DEP = mapOf("group" to "net.minecraft", "name" to "minecraft", "version" to "mcbin")
 val MCSRC_DEP = mapOf("group" to "net.minecraft", "name" to "minecraft", "version" to "mc")
@@ -21,7 +20,6 @@ const val PATCHED_MERGED = "$USER_VERSION_DIR/merged.patched.jar"
 const val PATCHED_INJECTED = "$USER_VERSION_DIR/injected.patched.jar"
 const val VANILLA_REPO = "$VERSION_DIRECTORY/repo"
 const val MOD_REPO = "$USER_VERSION_DIR/repo"
-const val START_LIB_LOCATION = "$VERSION_DIRECTORY/run-$RUN_STATE_HASH.jar"
 
 const val DEOBF_MCP = "$REPO/$MCBIN_PATH"
 const val DECOMP_BIN = "$REPO/$MCSRC_BIN_PATH"
@@ -35,3 +33,6 @@ const val BINPATCH_SERVER = "applyServerPatches"
 const val BINPATCH_MERGED = "applyBinaryPatches"
 const val INJECT_CLASSES = "injectMod"
 const val GEN_START = "genStart"
+const val GEN_CLIENT_RUN = "genClientRun"
+const val GEN_SERVER_RUN = "genServerRun"
+const val GEN_RUNS = "genRunConfigs"

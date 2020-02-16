@@ -3,7 +3,7 @@ package club.ampthedev.mcgradle.user.tasks
 import club.ampthedev.mcgradle.base.tasks.BaseTask
 import club.ampthedev.mcgradle.base.tasks.impl.TaskRecompile
 import club.ampthedev.mcgradle.base.utils.*
-import club.ampthedev.mcgradle.user.utils.START_LIB_LOCATION
+import groovy.json.StringEscapeUtils
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
@@ -12,7 +12,6 @@ import org.gradle.api.tasks.TaskAction
 import java.io.File
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 
 open class TaskGenerateStartLib : BaseTask(
         DOWNLOAD_NATIVES, DOWNLOAD_ASSETS) {
@@ -21,6 +20,9 @@ open class TaskGenerateStartLib : BaseTask(
 
     @Input
     fun getOptions() = StartSourceGenerator.options
+
+    @Input
+    lateinit var properties: Map<String, Any>
 
     @InputFiles
     lateinit var classpath: FileCollection
@@ -40,6 +42,29 @@ open class TaskGenerateStartLib : BaseTask(
         sourceFile.bufferedWriter().use {
             it.write(StartSourceGenerator.generate())
         }
+
+        var propertiesSource = """
+            package club.ampthedev.mcgradle;
+            
+            public final class Properties {
+                private Properties() {
+                }
+
+
+        """.trimIndent()
+
+        for (property in properties) {
+            propertiesSource += "    public static final String ${property.key} = \"${StringEscapeUtils.escapeJava(
+                property.value.toString()
+            )}\";\n"
+        }
+        propertiesSource += "}\n"
+        val sourceFile2 = File(sourceDir, "club/ampthedev/mcgradle/Properties.java")
+        prepareDirectory(sourceFile2.parentFile)
+        sourceFile2.bufferedWriter().use {
+            it.write(propertiesSource)
+        }
+
         TaskRecompile.updateExtDirs()
         ant.invokeMethod(
             "javac",
@@ -70,7 +95,8 @@ open class TaskGenerateStartLib : BaseTask(
     }
 
     override fun setup() {
-        if (!::library.isInitialized) library = project.mcgFile(START_LIB_LOCATION)
+        if (!::properties.isInitialized) properties = project.plugin.extension.properties
+        if (!::library.isInitialized) library = File(temporaryDir, "start.jar")
         if (!::classpath.isInitialized) classpath = project.configurations.getByName(CONFIGURATION_MC_DEPS)
     }
 }

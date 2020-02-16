@@ -19,15 +19,6 @@ open class TaskCopySource : BaseTask(APPLY_MOD_PATCHES) {
     @OutputDirectory
     lateinit var outputDir: File
 
-    @Input
-    lateinit var properties: Map<String, Any>
-
-    @Input
-    fun getOptions() = StartSourceGenerator.options
-
-    @Input
-    fun getTemplate() = StartSourceGenerator.template
-
     @TaskAction
     fun copy() {
         val sourceDir = File(outputDir, "java")
@@ -47,34 +38,6 @@ open class TaskCopySource : BaseTask(APPLY_MOD_PATCHES) {
                 it.copyTo(output)
             }
         }
-        val startClass = File(sourceDir, "club/ampthedev/mcgradle/Start.java")
-        prepareDirectory(startClass.parentFile)
-
-        startClass.writer().use {
-            it.write(StartSourceGenerator.generate())
-        }
-
-        var propertiesSource = """
-            package club.ampthedev.mcgradle;
-            
-            public final class Properties {
-                private Properties() {
-                }
-
-
-        """.trimIndent()
-
-        for (property in properties) {
-            propertiesSource += "    public static final String ${property.key} = \"${StringEscapeUtils.escapeJava(
-                property.value.toString()
-            )}\";\n"
-        }
-        propertiesSource += "}\n"
-        val propertiesSourceFile = File(sourceDir, "club/ampthedev/mcgradle/Properties.java")
-        prepareDirectory(propertiesSourceFile.parentFile)
-        propertiesSourceFile.bufferedWriter().use {
-            it.write(propertiesSource)
-        }
     }
 
     override fun setup() {
@@ -85,6 +48,5 @@ open class TaskCopySource : BaseTask(APPLY_MOD_PATCHES) {
             val task = project.tasks.getByName(APPLY_MOD_PATCHES) as TaskApplyPatches
             sourceJar = task.output!!
         }
-        if (!::properties.isInitialized) properties = project.plugin.extension.properties
     }
 }

@@ -12,7 +12,7 @@ abstract class BaseExtension(private val project: Project) : GroovyObjectSupport
     var mappingVersion = "22"
     var runDirectory = "run"
     var clientMainClass = "net.minecraft.client.main.Main"
-    var serverMainClass = "net.minecraft.server.dedicated.DedicatedServer"
+    var serverMainClass = "net.minecraft.server.MinecraftServer"
     var jvmargs = arrayListOf<String>()
     var args = arrayListOf<String>()
     var kotlinVersion: String? = null

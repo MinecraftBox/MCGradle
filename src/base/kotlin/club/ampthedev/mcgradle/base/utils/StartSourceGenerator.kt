@@ -11,11 +11,11 @@ object StartSourceGenerator {
     fun init(project: Project) {
         template = StartSourceGenerator::class.java.getResourceAsStream("/classes/Start.java").bufferedReader()
             .use { it.readText() }
-        options["runDirectory"] = project.string(RUN_DIRECTORY)
-        options["nativeDirectory"] = project.string(NATIVES_DIRECTORY)
+        options["runDirectory"] = project.mcgFile(RUN_DIRECTORY).absolutePath
+        options["nativeDirectory"] = project.mcgFile(NATIVES_DIRECTORY).absolutePath
         options["clientMainClass"] = project.string(project.plugin.extension.clientMainClass)
         options["serverMainClass"] = project.string(project.plugin.extension.serverMainClass)
-        options["assetsDirectory"] = project.string(ASSETS_DIRECTORY)
+        options["assetsDirectory"] = project.mcgFile(ASSETS_DIRECTORY).absolutePath
         options["assetIndex"] = project.getVersionJson().getAsJsonObject("assetIndex")["id"].asString
     }
 
