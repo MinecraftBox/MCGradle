@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'club.ampthedev.mcgradle'
-version '2.0.0'
+version '2.0.0-rv1'
 
 repositories {
     mavenCentral()
@@ -16,7 +16,6 @@ repositories {
 }
 
 sourceSets {
-    old {}
     main {
         java {
             srcDirs = ['src/base/java']
@@ -88,47 +87,12 @@ dependencies {
     userImplementation sourceSets.main.compileClasspath
     newdecompImplementation sourceSets.main.output
     newdecompImplementation sourceSets.main.compileClasspath
-
-    /*implementation sourceSets.base.compileClasspath
-    implementation sourceSets.patch.compileClasspath
-    implementation sourceSets.user.compileClasspath*/
-
-    oldImplementation gradleApi()
-    oldImplementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.5.1.201910021850-r'
-    oldImplementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
-    oldImplementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
-    oldImplementation group: 'org.ow2.asm', name: 'asm', version: '7.2'
-    oldImplementation group: 'org.ow2.asm', name: 'asm-tree', version: '7.2'
-    oldImplementation group: 'org.ow2.asm', name: 'asm-util', version: '7.2'
-    oldImplementation group: 'org.ow2.asm', name: 'asm-commons', version: '7.2'
-    oldImplementation group: 'org.ow2.asm', name: 'asm-analysis', version: '7.2'
-
-
-    oldImplementation 'net.sf.opencsv:opencsv:2.3'
-    oldImplementation('de.oceanlabs.mcp:RetroGuard:3.6.6') {
-        exclude module: 'asm-debug-all'
-    }
-    oldImplementation('de.oceanlabs.mcp:mcinjector:3.4-SNAPSHOT') {
-        exclude module: 'asm-debug-all'
-    }
-    oldImplementation('net.minecraftforge.srg2source:Srg2Source:3.3-SNAPSHOT') {
-        exclude module: 'asm-debug-all'
-    }
-    oldImplementation('net.md-5:SpecialSource:1.7.4') {
-        exclude module: 'asm-debug-all'
-    }
-    oldImplementation 'com.cloudbees:diff4j:1.1'
-    oldImplementation 'net.minecraftforge:fernflower:2.0-SNAPSHOT'
-    oldImplementation 'com.github.abrarsyed.jastyle:jAstyle:1.3'
-    oldImplementation group: 'com.nothome', name: 'javaxdelta', version: '2.0.1'
-    oldImplementation 'com.github.jponge:lzma-java:1.3'
-    oldImplementation 'io.github.java-diff-utils:java-diff-utils:4.4'
 }
 
 shadowJar {
     from sourceSets.patch.output
     from sourceSets.user.output
-    // from sourceSets.base.output
+
 
     dependsOn patchClasses
     dependsOn userClasses
