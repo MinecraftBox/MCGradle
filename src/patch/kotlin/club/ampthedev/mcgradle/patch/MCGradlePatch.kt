@@ -5,11 +5,12 @@ import club.ampthedev.mcgradle.base.tasks.TaskType
 import club.ampthedev.mcgradle.base.tasks.impl.*
 import club.ampthedev.mcgradle.base.utils.*
 import club.ampthedev.mcgradle.patch.tasks.TaskCopySource
+import club.ampthedev.mcgradle.patch.tasks.TaskGenerateArtifacts
+import club.ampthedev.mcgradle.patch.tasks.TaskGenerateBinPatches
 import club.ampthedev.mcgradle.patch.tasks.TaskGeneratePatches
 import club.ampthedev.mcgradle.patch.utils.*
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginConvention
-import org.gradle.api.tasks.Copy
 import org.gradle.jvm.tasks.Jar
 import java.io.File
 
@@ -30,7 +31,7 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
             output = File(project.string(PATCHED_JAR))
             patches = File(project.string(if (project.newConfig) MCP_PATCHES_NEW else MCP_PATCHES))
             mcpPatch = true
-            // dependsOn(DECOMP)
+            dependsOn(DECOMP)
         }
         task(DOWNLOAD_NATIVES, TaskDownloadNatives::class)
         task(SOURCE_DEOBF, TaskSourceDeobf::class)
@@ -46,13 +47,25 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
         task(COPY_SOURCES, TaskCopySource::class)
         task(GENERATE_PATCHES, TaskGeneratePatches::class)
         task(RECOMPILE_CLEAN_TASK, TaskRecompile::class)
-        val setupTask = project.task(SETUP)
+        task(REOBFUSCATE_JAR, TaskDeobf::class) {
+            jar = (project.tasks.getByName("jar") as Jar).archiveFile.get().asFile
+            srg = project.mcgFile(MCP_NOTCH)
+            out = File(temporaryDir, "reobf.jar")
+            dependsOn("jar")
+        }
+        task(GENERATE_BIN_PATCHES, TaskGenerateBinPatches::class)
+        task(GENERATE_ARTIFACTS, TaskGenerateArtifacts::class)
+        val setupTask = project.task(SETUP_DEV)
         setupTask.group = TaskType.MAIN.groupName
         setupTask.dependsOn(COPY_SOURCES, DOWNLOAD_NATIVES, DOWNLOAD_ASSETS)
+        val setupTask2 = project.task(SETUP_CI)
+        setupTask2.group = TaskType.MAIN.groupName
+        setupTask2.dependsOn(COPY_SOURCES)
     }
 
     override fun setup(project: Project) {
         super.setup(project)
+        project.tasks.getByName("assemble").dependsOn(GENERATE_ARTIFACTS)
         val javaPlugin = project.convention.getPlugin(JavaPluginConvention::class.java)
         val sourceSets = javaPlugin.sourceSets
         val main = extension.sourceSet ?: sourceSets.getByName("main")

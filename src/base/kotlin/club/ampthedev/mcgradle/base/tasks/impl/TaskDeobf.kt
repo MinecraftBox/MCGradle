@@ -13,6 +13,7 @@ import net.md_5.specialsource.JarRemapper
 import net.md_5.specialsource.RemapperProcessor
 import net.md_5.specialsource.provider.JarProvider
 import net.md_5.specialsource.provider.JointProvider
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -46,34 +47,43 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, MERGE_JARS, GENERATE_MAPPINGS) {
     @InputFile
     lateinit var exceptorJson: File
 
+    @Input
+    var skipExceptor = false
+
     @OutputFile
     lateinit var out: File
 
     @TaskAction
     fun deobf() {
-        val tempObfJar = File(project.string(DEOBF_TEMP_JAR))
+        val tempObfJar = if (skipExceptor) {
+            out
+        } else {
+            File(project.string(DEOBF_TEMP_JAR))
+        }
         jar.deobfJar(tempObfJar, srg)
-        if (project.newConfig) {
-            val clazz =
-                Class.forName("club.ampthedev.mcgradle.base.utils.MCInjectorStarter") // shadowjar changes package name
-            val method = clazz.getMethod(
-                "start",
-                File::class.java,
-                File::class.java,
-                File::class.java,
-                File::class.java,
-                File::class.java
-            )
-            method.invoke(
-                null,
+        if (!skipExceptor) {
+            if (project.newConfig) {
+                val clazz =
+                    Class.forName("club.ampthedev.mcgradle.base.utils.MCInjectorStarter") // shadowjar changes package name
+                val method = clazz.getMethod(
+                    "start",
+                    File::class.java,
+                    File::class.java,
+                    File::class.java,
+                    File::class.java,
+                    File::class.java
+                )
+                method.invoke(
+                    null,
                     tempObfJar,
                     out,
                     project.mcgFile(EXCEPTIONS_TXT),
                     project.mcgFile(ACCESS_TXT),
                     project.mcgFile(CONSTRUCTORS_TXT)
-            )
-        } else {
-            tempObfJar.applyExceptor(out, exceptorCfg)
+                )
+            } else {
+                tempObfJar.applyExceptor(out, exceptorCfg)
+            }
         }
     }
 
