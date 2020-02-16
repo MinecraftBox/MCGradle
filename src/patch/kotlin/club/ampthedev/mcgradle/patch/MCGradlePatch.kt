@@ -63,7 +63,7 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
             vmOptions.addAll(extension.jvmargs)
             args.addAll(extension.args)
             workingDirectory = File(extension.runDirectory)
-            beforeRunTasks.add(GEN_START)
+            beforeRunTasks += arrayOf(DOWNLOAD_NATIVES, DOWNLOAD_ASSETS, GEN_START)
         }
         task(GEN_SERVER_RUN, TaskCreateRunConfig::class) {
             configName = "Minecraft Server"
@@ -72,7 +72,7 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
             args.add("--server")
             args.addAll(extension.args)
             workingDirectory = File(extension.runDirectory)
-            beforeRunTasks.add(GEN_START)
+            beforeRunTasks += arrayOf(DOWNLOAD_NATIVES, DOWNLOAD_ASSETS, GEN_START)
         }
         val genConfigs = project.task(GEN_RUNS)
         genConfigs.group = TaskType.MAIN.groupName

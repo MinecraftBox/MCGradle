@@ -15,7 +15,7 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
-open class TaskInjectClasses : BaseTask(MERGE_PATCHED_JARS) {
+open class TaskInjectClasses : BaseTask() {
     @InputFile
     lateinit var mcJar: File
 

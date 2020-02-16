@@ -13,8 +13,7 @@ import java.io.File
 import java.util.jar.JarOutputStream
 import java.util.zip.ZipEntry
 
-open class TaskGenerateStartLib : BaseTask(
-        DOWNLOAD_NATIVES, DOWNLOAD_ASSETS) {
+open class TaskGenerateStartLib : BaseTask() {
     @Input
     fun getTemplate() = StartSourceGenerator.template
 
