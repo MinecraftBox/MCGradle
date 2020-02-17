@@ -93,6 +93,9 @@ class MCGradleUser : BasePlugin<UserExtension>() {
             patchRoot = "server"
             dependsOn(SPLIT_SERVER)
         }
+        task(INJECT_CLASSES, TaskInjectClasses::class) {
+            dependsOn(MERGE_PATCHED_JARS)
+        }
         task(MERGE_PATCHED_JARS, TaskMergeJars::class) {
             if (!project.vanilla) {
                 clientJar = project.mcgFile(PATCHED_CLIENT)
@@ -103,8 +106,8 @@ class MCGradleUser : BasePlugin<UserExtension>() {
         }
         task(MCP_DEOBF, TaskDeobf::class) {
             if (!project.vanilla) {
-                jar = project.mcgFile(PATCHED_MERGED)
-                dependsOn(MERGE_PATCHED_JARS)
+                jar = project.mcgFile(PATCHED_INJECTED)
+                dependsOn(INJECT_CLASSES)
             }
             out = project.mcgFile(DEOBF_MCP)
             srg = project.mcgFile(NOTCH_MCP)
@@ -173,6 +176,11 @@ class MCGradleUser : BasePlugin<UserExtension>() {
         if (modJar != null) {
             project.addReplacement(MOD_JAR, modJar.absolutePath)
             project.addReplacement(MOD_HASH, modJar.hash("SHA-256"))
+            for (f in conf) {
+                if (f != modJar) {
+                    project.dependencies.add("compile", project.files(f))
+                }
+            }
         }
         project.addReplacement(
             REPO, if (project.vanilla) {
