@@ -20,7 +20,7 @@ import java.util.jar.JarOutputStream
 import java.util.zip.Adler32
 
 open class TaskGenerateBinPatches :
-    BaseTask(DOWNLOAD_CLIENT, DOWNLOAD_SERVER, RECOMPILE_CLEAN_TASK, REOBFUSCATE_JAR, GENERATE_MAPPINGS, "jar") {
+    BaseTask(DOWNLOAD_CLIENT, GENERATE_PATCHES, DOWNLOAD_SERVER, RECOMPILE_CLEAN_TASK, REOBFUSCATE_JAR, GENERATE_MAPPINGS, "jar") {
     @InputFile
     lateinit var cleanClient: File
 

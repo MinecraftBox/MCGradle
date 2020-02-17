@@ -60,8 +60,26 @@ open class TaskDeobf : BaseTask(TaskType.OTHER) {
         } else {
             File(project.string(DEOBF_TEMP_JAR))
         }
-        jar.deobfJar(tempObfJar, srg)
+        val toDeobf = if (jar == tempObfJar) {
+            val file = File(temporaryDir, "todeobf.jar")
+            file.delete()
+            prepareDirectory(file.parentFile)
+            jar.copyTo(file, overwrite = true)
+            file
+        } else {
+            jar
+        }
+        toDeobf.deobfJar(tempObfJar, srg)
         if (!skipExceptor) {
+            val toExcept = if (tempObfJar == out) {
+                val file = File(temporaryDir, "toexcept.jar")
+                file.delete()
+                prepareDirectory(file.parentFile)
+                tempObfJar.copyTo(file, overwrite = true)
+                file
+            } else {
+                tempObfJar
+            }
             if (project.newConfig) {
                 val clazz =
                     Class.forName("club.ampthedev.mcgradle.base.utils.MCInjectorStarter") // shadowjar changes package name
@@ -75,14 +93,14 @@ open class TaskDeobf : BaseTask(TaskType.OTHER) {
                 )
                 method.invoke(
                     null,
-                    tempObfJar,
+                    toExcept,
                     out,
                     project.mcgFile(EXCEPTIONS_TXT),
                     project.mcgFile(ACCESS_TXT),
                     project.mcgFile(CONSTRUCTORS_TXT)
                 )
             } else {
-                tempObfJar.applyExceptor(out, exceptorCfg)
+                toExcept.applyExceptor(out, exceptorCfg)
             }
         }
     }

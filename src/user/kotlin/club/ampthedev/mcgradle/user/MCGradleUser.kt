@@ -11,6 +11,7 @@ import club.ampthedev.mcgradle.user.utils.*
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
+import org.gradle.jvm.tasks.Jar
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -100,13 +101,10 @@ class MCGradleUser : BasePlugin<UserExtension>() {
                 dependsOn(BINPATCH_CLIENT, BINPATCH_SERVER)
             }
         }
-        task(INJECT_CLASSES, TaskInjectClasses::class) {
-            dependsOn(MERGE_PATCHED_JARS)
-        }
         task(MCP_DEOBF, TaskDeobf::class) {
             if (!project.vanilla) {
-                jar = project.mcgFile(PATCHED_INJECTED)
-                dependsOn(INJECT_CLASSES)
+                jar = project.mcgFile(PATCHED_MERGED)
+                dependsOn(MERGE_PATCHED_JARS)
             }
             out = project.mcgFile(DEOBF_MCP)
             srg = project.mcgFile(NOTCH_MCP)
@@ -129,6 +127,13 @@ class MCGradleUser : BasePlugin<UserExtension>() {
             workingDirectory = File(extension.runDirectory)
             beforeRunTasks += arrayOf(DOWNLOAD_NATIVES, DOWNLOAD_ASSETS, GEN_START)
         }
+        task(REOBF_JAR, TaskDeobf::class) {
+            jar = (project.tasks.getByName("jar") as Jar).archiveFile.get().asFile
+            srg = project.mcgFile(MCP_NOTCH)
+            skipExceptor = true
+            out = jar
+            dependsOn("jar")
+        }
         val genConfigs = project.task(GEN_RUNS)
         genConfigs.group = TaskType.MAIN.groupName
         genConfigs.dependsOn(GEN_CLIENT_RUN, GEN_SERVER_RUN)
@@ -139,6 +144,7 @@ class MCGradleUser : BasePlugin<UserExtension>() {
     }
 
     override fun setup(project: Project) {
+        project.tasks.getByName("jar").finalizedBy(REOBF_JAR)
         project.repositories.mavenCentral()
         project.repositories.maven { it.setUrl("https://files.minecraftforge.net/maven") }
         project.repositories.maven { it.setUrl("https://libraries.minecraft.net") }
@@ -191,6 +197,7 @@ class MCGradleUser : BasePlugin<UserExtension>() {
             !(tasks.contains(SETUP_CI) || tasks.contains(SETUP_DEV) || tasks.contains(SETUP_DECOMP)) -> println("Please run a setup task ASAP.")
         }
         project.configurations.getByName("compile").extendsFrom(project.configurations.getByName(CONFIGURATION_MC_DEPS))
+        project.configurations.getByName("compile").extendsFrom(project.configurations.getByName(CONFIGURATION_MOD))
 
         val setupCI = project.tasks.create(SETUP_DEV)
         setupCI.group = TaskType.MAIN.groupName
