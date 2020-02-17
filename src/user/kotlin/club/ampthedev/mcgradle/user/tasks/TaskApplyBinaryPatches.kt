@@ -14,6 +14,7 @@ import java.util.jar.JarInputStream
 import java.util.zip.Adler32
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 
 open class TaskApplyBinaryPatches : ZipEditTask() {
     @Input
@@ -29,19 +30,21 @@ open class TaskApplyBinaryPatches : ZipEditTask() {
         ZipFile(project.mcgFile(MOD_JAR)).use {
             val entry = it.getEntry(patchLzmaPath)
             val matcher = "binpatch/$patchRoot/.*.binpatch".toPattern()
-            LzmaInputStream(it.getInputStream(entry), Decoder()).use { decompressed ->
-                JarInputStream(decompressed).use { jis ->
-                    while (true) {
-                        val jEntry = try {
-                            jis.nextJarEntry ?: break
-                        } catch (e: IOException) { break }
-                        if (matcher.matcher(jEntry.name).matches()) {
-                            val cp = jis.readPatch()
-                            patches[cp.sourceClassName.replace('.', '/') + ".class"] = cp
-                        }
-                    }
+            val lzma = LzmaInputStream(it.getInputStream(entry), Decoder())
+            val jis = ZipInputStream(lzma)
+            while (true) {
+                val jEntry = try {
+                    jis.nextEntry ?: break
+                } catch (e: IOException) {
+                    break
                 }
+                if (matcher.matcher(jEntry.name).matches()) {
+                    val cp = jis.readPatch()
+                    patches[cp.sourceClassName.replace('.', '/') + ".class"] = cp
+                } else jis.closeEntry()
             }
+            // Closing them caused issues. We aren't going to be running this process
+            // for long anyways
         }
     }
 
@@ -61,8 +64,8 @@ open class TaskApplyBinaryPatches : ZipEditTask() {
         return bytes
     }
 
-    private fun JarInputStream.readPatch(): ClassPatch {
-        val input = ByteStreams.newDataInput(use { readBytes() })
+    private fun ZipInputStream.readPatch(): ClassPatch {
+        val input = ByteStreams.newDataInput(readBytes())
         val name = input.readUTF()
         val sourceClassName = input.readUTF()
         val targetClassName = input.readUTF()

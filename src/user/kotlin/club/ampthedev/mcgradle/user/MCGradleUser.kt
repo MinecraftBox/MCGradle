@@ -194,11 +194,11 @@ class MCGradleUser : BasePlugin<UserExtension>() {
 
         val setupCI = project.tasks.create(SETUP_DEV)
         setupCI.group = TaskType.MAIN.groupName
-        setupCI.dependsOn(DEOBF_MCP, GEN_START)
+        setupCI.dependsOn(MCP_DEOBF, GEN_START)
 
         val setupDev = project.tasks.create(SETUP_CI)
         setupDev.group = TaskType.MAIN.groupName
-        setupDev.dependsOn(DEOBF_MCP, GEN_START, DOWNLOAD_NATIVES, DOWNLOAD_ASSETS)
+        setupDev.dependsOn(MCP_DEOBF, GEN_START, DOWNLOAD_NATIVES, DOWNLOAD_ASSETS)
 
         val copySourceJar = project.tasks.create(COPY_SOURCE, Copy::class.java)
         copySourceJar.group = TaskType.OTHER.groupName
