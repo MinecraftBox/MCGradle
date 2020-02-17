@@ -3,6 +3,7 @@ package club.ampthedev.mcgradle.patch.tasks
 import club.ampthedev.mcgradle.base.tasks.BaseTask
 import club.ampthedev.mcgradle.base.tasks.impl.TaskDeobf
 import club.ampthedev.mcgradle.base.utils.*
+import club.ampthedev.mcgradle.patch.utils.GENERATE_PATCHES
 import club.ampthedev.mcgradle.patch.utils.REOBFUSCATE_JAR
 import com.google.common.collect.ArrayListMultimap
 import com.google.common.io.ByteStreams
