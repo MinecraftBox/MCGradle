@@ -205,7 +205,6 @@ class MCGradleUser : BasePlugin<UserExtension>() {
             !(tasks.contains(SETUP_CI) || tasks.contains(SETUP_DEV) || tasks.contains(SETUP_DECOMP)) -> println("Please run a setup task ASAP.")
         }
         project.configurations.getByName("compile").extendsFrom(project.configurations.getByName(CONFIGURATION_MC_DEPS))
-        project.configurations.getByName("compile").extendsFrom(project.configurations.getByName(CONFIGURATION_MOD))
 
         val setupCI = project.tasks.create(SETUP_DEV)
         setupCI.group = TaskType.MAIN.groupName
