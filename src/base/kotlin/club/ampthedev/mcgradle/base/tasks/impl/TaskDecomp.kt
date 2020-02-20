@@ -46,32 +46,28 @@ open class TaskDecomp : BaseTask(DEOBF_JAR) {
                 input = input
             )
         } else {
+            val printStream = PrintStream(File(tempDir, "decompiler.log").absolutePath)
+            val decompiler = if (project.newDecomp) {
+                val clazz = Class.forName(OldDecompiler::class.java.name.replace("Old", "New").replace("old", "new"))
+                val constr = clazz.getConstructor(File::class.java, PrintStream::class.java)
+                constr.newInstance(tempDir, printStream) as Decompiler
+            } else {
+                OldDecompiler(tempDir, printStream)
+            }
 
+            if (Runtime.getRuntime().maxMemory() < 2000L * 1024 * 1024) {
+                logger.warn("There might not be enough RAM allocated to Gradle to decompile MC!")
+            }
 
-        val printStream = PrintStream(File(tempDir, "decompiler.log").absolutePath)
-        val decompiler = if (project.newDecomp) {
-            val file = MCPConfigUtils.getTaskJar(project, "decompile")
+            decompiler.addInput(input)
 
-            val clazz = Class.forName(OldDecompiler::class.java.name.replace("Old", "New").replace("old", "new"))
-            val constr = clazz.getConstructor(File::class.java, PrintStream::class.java)
-            constr.newInstance(tempDir, printStream) as Decompiler
-        } else {
-            OldDecompiler(tempDir, printStream)
-        }
+            for (file in classpath.files) {
+                decompiler.addLibrary(file)
+            }
 
-        if (Runtime.getRuntime().maxMemory() < 2000L * 1024 * 1024) {
-            logger.warn("There might not be enough RAM allocated to Gradle to decompile MC!")
-        }
+            decompiler.start()
 
-        decompiler.addInput(input)
-
-        for (file in classpath.files) {
-            decompiler.addLibrary(file)
-        }
-
-        decompiler.start()
-
-        System.gc()
+            System.gc()
         }
         output.delete()
         tempJar.copyTo(output, overwrite = true)
