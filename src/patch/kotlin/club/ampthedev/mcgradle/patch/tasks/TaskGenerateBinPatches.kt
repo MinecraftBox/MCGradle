@@ -2,6 +2,7 @@ package club.ampthedev.mcgradle.patch.tasks
 
 import club.ampthedev.mcgradle.base.tasks.BaseTask
 import club.ampthedev.mcgradle.base.tasks.impl.TaskDeobf
+import club.ampthedev.mcgradle.base.tasks.impl.TaskReobf
 import club.ampthedev.mcgradle.base.utils.*
 import club.ampthedev.mcgradle.patch.utils.GENERATE_PATCHES
 import club.ampthedev.mcgradle.patch.utils.REOBFUSCATE_JAR
@@ -21,7 +22,15 @@ import java.util.jar.JarOutputStream
 import java.util.zip.Adler32
 
 open class TaskGenerateBinPatches :
-    BaseTask(DOWNLOAD_CLIENT, GENERATE_PATCHES, DOWNLOAD_SERVER, RECOMPILE_CLEAN_TASK, REOBFUSCATE_JAR, GENERATE_MAPPINGS, "jar") {
+    BaseTask(
+        DOWNLOAD_CLIENT,
+        GENERATE_PATCHES,
+        DOWNLOAD_SERVER,
+        RECOMPILE_CLEAN_TASK,
+        REOBFUSCATE_JAR,
+        GENERATE_MAPPINGS,
+        "jar"
+    ) {
     @InputFile
     lateinit var cleanClient: File
 
@@ -66,6 +75,7 @@ open class TaskGenerateBinPatches :
                     .replace('.', '/')
                 val obfName = srgMapping[path] ?: path
                 patchedFiles.add(obfName)
+                addInnerClasses(path, patchedFiles)
             }
         }
 
@@ -85,6 +95,15 @@ open class TaskGenerateBinPatches :
 
         devBinPatches.outputStream().use {
             it.write(devtime.createPatchJar().compress())
+        }
+    }
+
+    private fun addInnerClasses(parent: String, patchList: MutableSet<String>) {
+        for (inner in innerClasses[parent]) {
+            if (srgMapping.contains(inner)) {
+                patchList.add(srgMapping[inner]!!)
+            }
+            addInnerClasses(inner, patchList)
         }
     }
 
@@ -108,16 +127,18 @@ open class TaskGenerateBinPatches :
     }
 
     private fun MutableMap<String, ByteArray>.createBinPatches(root: String, base: File, target: File, reobf: Boolean) {
-        JarFile(base).use { cleanJar ->
-            JarFile(target).use { dirtyJar ->
+        JarFile(target).use { dirtyJar ->
+            JarFile(base).use { cleanJar ->
                 for (entry in obfMapping) {
                     val obf = entry.key
                     val srg = entry.value
                     if (!patchedFiles.contains(obf)) continue
                     val entryName = if (reobf) obf else srg
-                    val cleanEntry = cleanJar.getJarEntry("$entryName.class") ?: continue
+                    val cleanEntry = cleanJar.getJarEntry("$entryName.class")
                     val dirtyEntry = dirtyJar.getJarEntry("$entryName.class") ?: continue
-                    val clean = cleanJar.getInputStream(cleanEntry).use { it.readBytes() }
+                    val clean = if (cleanEntry != null)
+                        cleanJar.getInputStream(cleanEntry).use { it.readBytes() }
+                    else byteArrayOf()
                     val dirty = dirtyJar.getInputStream(dirtyEntry).use { it.readBytes() }
 
                     val diff = delta.compute(clean, dirty)
@@ -125,8 +146,10 @@ open class TaskGenerateBinPatches :
                     out.writeUTF(entryName)
                     out.writeUTF(entryName.replace('/', '.'))
                     out.writeUTF(srg.replace('/', '.'))
-                    out.writeBoolean(true)
-                    out.writeLong(clean.adlerHash())
+                    out.writeBoolean(cleanEntry != null)
+                    if (cleanEntry != null) {
+                        out.writeLong(clean.adlerHash())
+                    }
                     out.writeInt(diff.size)
                     out.write(diff)
                     this[root + srg.replace('/', '.') + ".binpatch"] = out.toByteArray()
@@ -161,7 +184,7 @@ open class TaskGenerateBinPatches :
         if (!::cleanClient.isInitialized) cleanClient = project.mcgFile(CLIENT_JAR)
         if (!::cleanServer.isInitialized) cleanServer = project.mcgFile(SERVER_JAR)
         if (!::cleanDev.isInitialized) cleanDev = project.mcgFile(VANILLA_RECOMPILED_JAR)
-        if (!::dirtyJar.isInitialized) dirtyJar = (project.tasks.getByName(REOBFUSCATE_JAR) as TaskDeobf).out
+        if (!::dirtyJar.isInitialized) dirtyJar = (project.tasks.getByName(REOBFUSCATE_JAR) as TaskReobf).output
         if (!::dirtyDev.isInitialized) dirtyDev = (project.tasks.getByName("jar") as Jar).archiveFile.get().asFile
         if (!::srg.isInitialized) srg = project.mcgFile(NOTCH_SRG)
         if (!::runBinPatches.isInitialized) runBinPatches = File(temporaryDir, "binpatches.lzma")

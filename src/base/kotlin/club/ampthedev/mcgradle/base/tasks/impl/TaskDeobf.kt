@@ -7,16 +7,11 @@ import com.google.gson.Gson
 import com.google.gson.JsonParser
 import de.oceanlabs.mcp.mcinjector.LVTNaming
 import de.oceanlabs.mcp.mcinjector.MCInjectorImpl
-import net.md_5.specialsource.Jar
-import net.md_5.specialsource.JarMapping
-import net.md_5.specialsource.JarRemapper
-import net.md_5.specialsource.RemapperProcessor
+import net.md_5.specialsource.*
 import net.md_5.specialsource.provider.JarProvider
 import net.md_5.specialsource.provider.JointProvider
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.InputFile
-import org.gradle.api.tasks.OutputFile
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.file.FileCollection
+import org.gradle.api.tasks.*
 import java.io.File
 import java.util.zip.ZipFile
 
@@ -49,6 +44,9 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, GENERATE_MAPPINGS) {
 
     @Input
     var skipExceptor = false
+
+    @InputFiles
+    var accessTransformers: FileCollection = project.files()
 
     @OutputFile
     lateinit var out: File
@@ -108,7 +106,11 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, GENERATE_MAPPINGS) {
     private fun File.deobfJar(out: File, srg: File) {
         val mapping = JarMapping()
         mapping.loadMappings(srg)
-        val srgProcessor = RemapperProcessor(null, mapping, null)
+        val accessMap = AccessMap()
+        for (transformer in accessTransformers) {
+            accessMap.loadAccessTransformer(transformer)
+        }
+        val srgProcessor = RemapperProcessor(null, mapping, accessMap)
         val remapper = JarRemapper(srgProcessor, mapping, null)
         val input = Jar.init(this)
         val inheritanceProvider = JointProvider()

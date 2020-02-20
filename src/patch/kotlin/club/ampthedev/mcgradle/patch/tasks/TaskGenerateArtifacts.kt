@@ -2,6 +2,7 @@ package club.ampthedev.mcgradle.patch.tasks
 
 import club.ampthedev.mcgradle.base.tasks.BaseTask
 import club.ampthedev.mcgradle.base.tasks.impl.TaskDeobf
+import club.ampthedev.mcgradle.base.tasks.impl.TaskReobf
 import club.ampthedev.mcgradle.base.utils.MERGED_JAR
 import club.ampthedev.mcgradle.base.utils.MERGE_JARS
 import club.ampthedev.mcgradle.base.utils.mcgFile
@@ -61,7 +62,7 @@ open class TaskGenerateArtifacts :
     }
 
     override fun setup() {
-        if (!::reobfuscated.isInitialized) reobfuscated = (project.tasks.getByName(REOBFUSCATE_JAR) as TaskDeobf).out
+        if (!::reobfuscated.isInitialized) reobfuscated = (project.tasks.getByName(REOBFUSCATE_JAR) as TaskReobf).output
         if (!::original.isInitialized) original = project.mcgFile(MERGED_JAR)
         val genBinPatches = project.tasks.getByName(GENERATE_BIN_PATCHES) as TaskGenerateBinPatches
         if (!::runBinPatches.isInitialized) runBinPatches = genBinPatches.runBinPatches

@@ -49,11 +49,10 @@ class MCGradlePatch : BasePlugin<PatchExtension>() {
         task(COPY_SOURCES, TaskCopySource::class)
         task(GENERATE_PATCHES, TaskGeneratePatches::class)
         task(RECOMPILE_CLEAN_TASK, TaskRecompile::class)
-        task(REOBFUSCATE_JAR, TaskDeobf::class) {
-            jar = (project.tasks.getByName("jar") as Jar).archiveFile.get().asFile
-            srg = project.mcgFile(MCP_NOTCH)
-            out = File(temporaryDir, "reobf.jar")
-            dependsOn("jar")
+        task(REOBFUSCATE_JAR, TaskReobf::class) {
+            input = (project.tasks.getByName("jar") as Jar).archiveFile.get().asFile
+            output = File(temporaryDir, "reobf.jar")
+            dependsOn("jar", DEOBF_JAR)
         }
         task(GENERATE_BIN_PATCHES, TaskGenerateBinPatches::class)
         task(GENERATE_ARTIFACTS, TaskGenerateArtifacts::class)

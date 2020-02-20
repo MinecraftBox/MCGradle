@@ -80,7 +80,7 @@ open class TaskSourceDeobf : ZipEditTask(TaskType.OTHER, APPLY_MCP_PATCHES) {
     private fun buildJavadoc(indent: String, javadoc: String, isMethod: Boolean): String {
         val builder = StringBuilder()
         val list = LinkedList<String>()
-        for (line in javadoc.split("\\n")) {
+        for (line in javadoc.split("\n")) {
             list.addAll(line.wrap(120 - indent.length + 3))
         }
 
@@ -120,7 +120,7 @@ open class TaskSourceDeobf : ZipEditTask(TaskType.OTHER, APPLY_MCP_PATCHES) {
                     lines.add(line.toString())
                     line.delete(0, line.length)
                 }
-
+                line.append(word)
                 word.delete(0, word.length)
             } else {
                 word.append(c)
@@ -185,7 +185,7 @@ open class TaskSourceDeobf : ZipEditTask(TaskType.OTHER, APPLY_MCP_PATCHES) {
 
     companion object {
         val SRG_FINDER = "func_[0-9]+_[a-zA-Z_]+|field_[0-9]+_[a-zA-Z_]+|p_[\\w]+_\\d+_\\b".toPattern()
-        val METHOD = "^((?: {3})+|\\t+)(?:[\\w\$.\\[\\]]+ )+(func_[0-9]+_[a-zA-Z_]+)\\(".toPattern()
-        val FIELD = "^((?: {3})+|\\t+)(?:[\\w\$.\\[\\]]+ )+(field_[0-9]+_[a-zA-Z_]+) *[=;]".toPattern()
+        val METHOD = "^((?: {4})+|\\t+)(?:[\\w\$.\\[\\]]+ )+(func_[0-9]+_[a-zA-Z_]+)\\(".toPattern()
+        val FIELD = "^((?: {4})+|\\t+)(?:[\\w\$.\\[\\]]+ )+(field_[0-9]+_[a-zA-Z_]+) *[=;]".toPattern()
     }
 }

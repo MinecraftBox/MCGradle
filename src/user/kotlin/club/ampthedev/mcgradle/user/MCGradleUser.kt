@@ -107,7 +107,9 @@ class MCGradleUser : BasePlugin<UserExtension>() {
         task(MCP_DEOBF, TaskDeobf::class) {
             if (!project.vanilla) {
                 jar = project.mcgFile(PATCHED_INJECTED)
-                dependsOn(INJECT_CLASSES)
+                dependsOn(INJECT_CLASSES, MERGE_PATCHED_JARS)
+            } else {
+                dependsOn(MERGE_JARS)
             }
             out = project.mcgFile(DEOBF_MCP)
             srg = project.mcgFile(NOTCH_MCP)

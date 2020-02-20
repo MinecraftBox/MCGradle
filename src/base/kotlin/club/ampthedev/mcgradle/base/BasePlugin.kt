@@ -12,6 +12,7 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
     private val tasks = hashMapOf<String, Pair<BaseTask, BaseTask.() -> Unit>>()
 
     open fun preSetup(project: Project) {
+        // 🦀
         project.plugins.apply("idea")
         this.project = project
         project.plugin = this
