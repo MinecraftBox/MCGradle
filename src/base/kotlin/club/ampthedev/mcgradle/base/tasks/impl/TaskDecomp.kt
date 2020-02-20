@@ -4,6 +4,7 @@ import club.ampthedev.mcgradle.base.tasks.BaseTask
 import club.ampthedev.mcgradle.base.tasks.impl.decomp.Decompiler
 import club.ampthedev.mcgradle.base.tasks.impl.decomp.old.OldDecompiler
 import club.ampthedev.mcgradle.base.utils.*
+import club.ampthedev.mcgradle.base.utils.mcpconfig.MCPConfigUtils
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
@@ -27,9 +28,30 @@ open class TaskDecomp : BaseTask(DEOBF_JAR) {
         val tempDir = File(project.string(DECOMP_TEMP))
         prepareDirectory(tempDir)
         val tempJar = File(tempDir, input.name)
+        if (project.newConfig) {
+            val configFile = File(temporaryDir, "libraries.txt")
+            configFile.bufferedWriter().use {
+                for (file in classpath) {
+                    it.write("-e=")
+                    it.write(file.absolutePath)
+                    it.newLine()
+                }
+            }
+            MCPConfigUtils.runTask(
+                project,
+                "decompile",
+                tempDir,
+                File(temporaryDir, "decompile.log"),
+                "libraries" to configFile.absolutePath,
+                input = input
+            )
+        } else {
+
 
         val printStream = PrintStream(File(tempDir, "decompiler.log").absolutePath)
         val decompiler = if (project.newDecomp) {
+            val file = MCPConfigUtils.getTaskJar(project, "decompile")
+
             val clazz = Class.forName(OldDecompiler::class.java.name.replace("Old", "New").replace("old", "new"))
             val constr = clazz.getConstructor(File::class.java, PrintStream::class.java)
             constr.newInstance(tempDir, printStream) as Decompiler
@@ -50,6 +72,7 @@ open class TaskDecomp : BaseTask(DEOBF_JAR) {
         decompiler.start()
 
         System.gc()
+        }
         output.delete()
         tempJar.copyTo(output, overwrite = true)
     }

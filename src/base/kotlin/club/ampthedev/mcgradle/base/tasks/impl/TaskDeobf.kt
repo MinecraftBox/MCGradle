@@ -3,6 +3,7 @@ package club.ampthedev.mcgradle.base.tasks.impl
 import club.ampthedev.mcgradle.base.tasks.BaseTask
 import club.ampthedev.mcgradle.base.tasks.TaskType
 import club.ampthedev.mcgradle.base.utils.*
+import club.ampthedev.mcgradle.base.utils.mcpconfig.MCPConfigUtils
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import de.oceanlabs.mcp.mcinjector.LVTNaming
@@ -67,37 +68,33 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, GENERATE_MAPPINGS) {
         } else {
             jar
         }
-        toDeobf.deobfJar(tempObfJar, srg)
-        if (!skipExceptor) {
-            val toExcept = if (tempObfJar == out) {
-                val file = File(temporaryDir, "toexcept.jar")
-                file.delete()
-                prepareDirectory(file.parentFile)
-                tempObfJar.copyTo(file, overwrite = true)
-                file
-            } else {
-                tempObfJar
+        if (project.newConfig) {
+            MCPConfigUtils.runTask(
+                project,
+                "rename",
+                tempObfJar,
+                File(temporaryDir, "rename.log"),
+                input = toDeobf
+            )
+            if (!skipExceptor) {
+                MCPConfigUtils.runTask(project,
+                "mcinject",
+                out,
+                File(temporaryDir, "mcinject.log"),
+                input = tempObfJar)
             }
-            if (project.newConfig) {
-                val clazz =
-                    Class.forName("club.ampthedev.mcgradle.base.utils.MCInjectorStarter") // shadowjar changes package name
-                val method = clazz.getMethod(
-                    "start",
-                    File::class.java,
-                    File::class.java,
-                    File::class.java,
-                    File::class.java,
-                    File::class.java
-                )
-                method.invoke(
-                    null,
-                    toExcept,
-                    out,
-                    project.mcgFile(EXCEPTIONS_TXT),
-                    project.mcgFile(ACCESS_TXT),
-                    project.mcgFile(CONSTRUCTORS_TXT)
-                )
-            } else {
+        } else {
+            toDeobf.deobfJar(tempObfJar, srg)
+            if (!skipExceptor) {
+                val toExcept = if (tempObfJar == out) {
+                    val file = File(temporaryDir, "toexcept.jar")
+                    file.delete()
+                    prepareDirectory(file.parentFile)
+                    tempObfJar.copyTo(file, overwrite = true)
+                    file
+                } else {
+                    tempObfJar
+                }
                 toExcept.applyExceptor(out, exceptorCfg)
             }
         }

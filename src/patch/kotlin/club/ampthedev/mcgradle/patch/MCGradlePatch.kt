@@ -4,6 +4,7 @@ import club.ampthedev.mcgradle.base.BasePlugin
 import club.ampthedev.mcgradle.base.tasks.TaskType
 import club.ampthedev.mcgradle.base.tasks.impl.*
 import club.ampthedev.mcgradle.base.utils.*
+import club.ampthedev.mcgradle.base.utils.mcpconfig.MCPConfigUtils
 import club.ampthedev.mcgradle.patch.tasks.*
 import club.ampthedev.mcgradle.patch.utils.*
 import org.gradle.api.Project

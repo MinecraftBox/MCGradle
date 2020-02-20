@@ -2,6 +2,7 @@ package club.ampthedev.mcgradle.base
 
 import club.ampthedev.mcgradle.base.tasks.BaseTask
 import club.ampthedev.mcgradle.base.utils.*
+import club.ampthedev.mcgradle.base.utils.mcpconfig.MCPConfigUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import kotlin.reflect.KClass
@@ -60,6 +61,8 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
                 "version" to "${extension.mappingVersion}-${extension.version}",
                 "ext" to "zip"
         ))
+
+        MCPConfigUtils.init(project)
 
         if (project.newConfig) {
             project.dependencies.add(CONFIGURATION_MCP_MAPS, mapOf(

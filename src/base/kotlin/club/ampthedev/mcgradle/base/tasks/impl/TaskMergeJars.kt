@@ -2,6 +2,7 @@ package club.ampthedev.mcgradle.base.tasks.impl
 
 import club.ampthedev.mcgradle.base.tasks.BaseTask
 import club.ampthedev.mcgradle.base.utils.*
+import club.ampthedev.mcgradle.base.utils.mcpconfig.MCPConfigUtils
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import org.gradle.api.tasks.InputFile
@@ -32,42 +33,50 @@ open class TaskMergeJars : BaseTask(SPLIT_SERVER, DOWNLOAD_CLIENT) {
 
     @TaskAction
     fun merge() {
-        ZipFile(clientJar).use { cJar ->
-            ZipFile(serverJar).use { sJar ->
-                ZipOutputStream(mergedJar.outputStream()).use { out ->
-                    val resources = hashSetOf<String>()
-                    val clientClasses = cJar.getClasses(out, resources)
-                    val serverClasses = sJar.getClasses(out, resources)
-                    val added = hashSetOf<String>()
-                    for (entry in clientClasses) {
-                        val name = entry.key
-                        val entry1 = entry.value
-                        val entry2 = serverClasses[name]
-                        if (entry2 == null) {
-                            entry1.copyClass(cJar, out, true)
+        if (project.newConfig) {
+            MCPConfigUtils.runTask(
+                project, "merge", mergedJar, File(temporaryDir, "merge.log"),
+                "client" to clientJar.absolutePath,
+                "server" to serverJar.absolutePath
+            )
+        } else {
+            ZipFile(clientJar).use { cJar ->
+                ZipFile(serverJar).use { sJar ->
+                    ZipOutputStream(mergedJar.outputStream()).use { out ->
+                        val resources = hashSetOf<String>()
+                        val clientClasses = cJar.getClasses(out, resources)
+                        val serverClasses = sJar.getClasses(out, resources)
+                        val added = hashSetOf<String>()
+                        for (entry in clientClasses) {
+                            val name = entry.key
+                            val entry1 = entry.value
+                            val entry2 = serverClasses[name]
+                            if (entry2 == null) {
+                                entry1.copyClass(cJar, out, true)
+                                added.add(name)
+                                continue
+                            }
+                            serverClasses.remove(name)
+                            val data1 = cJar.getInputStream(entry1).use { it.readBytes() }
+                            val data2 = sJar.getInputStream(entry2).use { it.readBytes() }
+                            val data = process(data1, data2)
+                            val entry3 = ZipEntry(entry1.name)
+                            out.putNextEntry(entry3)
+                            out.write(data)
                             added.add(name)
-                            continue
                         }
-                        serverClasses.remove(name)
-                        val data1 = cJar.getInputStream(entry1).use { it.readBytes() }
-                        val data2 = sJar.getInputStream(entry2).use { it.readBytes() }
-                        val data = process(data1, data2)
-                        val entry3 = ZipEntry(entry1.name)
-                        out.putNextEntry(entry3)
-                        out.write(data)
-                        added.add(name)
-                    }
-                    for (entry in serverClasses) {
-                        entry.value.copyClass(sJar, out, false)
-                    }
+                        for (entry in serverClasses) {
+                            entry.value.copyClass(sJar, out, false)
+                        }
 
-                    for (name in arrayOf(SIDE_CLASS.name, SIDE_ENUM_CLASS.name)) {
-                        val name1 = name.replace('.', '/')
-                        val path = "$name1.class"
-                        val entry1 = ZipEntry(path)
-                        if (!added.contains(name1)) {
-                            out.putNextEntry(entry1)
-                            out.write(name1.bytes)
+                        for (name in arrayOf(SIDE_CLASS.name, SIDE_ENUM_CLASS.name)) {
+                            val name1 = name.replace('.', '/')
+                            val path = "$name1.class"
+                            val entry1 = ZipEntry(path)
+                            if (!added.contains(name1)) {
+                                out.putNextEntry(entry1)
+                                out.write(name1.bytes)
+                            }
                         }
                     }
                 }
@@ -273,7 +282,8 @@ open class TaskMergeJars : BaseTask(SPLIT_SERVER, DOWNLOAD_CLIENT) {
 
     private fun createAnnotation(client: Boolean): AnnotationNode {
         val node = AnnotationNode(Type.getDescriptor(SIDE_CLASS))
-        node.values = arrayListOf<Any>("value", arrayOf(Type.getDescriptor(SIDE_ENUM_CLASS), if (client) "CLIENT" else "SERVER"))
+        node.values =
+            arrayListOf<Any>("value", arrayOf(Type.getDescriptor(SIDE_ENUM_CLASS), if (client) "CLIENT" else "SERVER"))
         return node
     }
 
