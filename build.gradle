@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'club.ampthedev.mcgradle'
-version '2.0.5'
+version '2.0.6'
 
 repositories {
     mavenCentral()
@@ -63,7 +63,9 @@ dependencies {
     runtimeOnly('de.oceanlabs.mcp:mcinjector:3.7.7') {
         exclude module: 'gson'
     }
-    mcinjectstartImplementation 'de.oceanlabs.mcp:mcinjector:3.7.7'
+    mcinjectstartImplementation('de.oceanlabs.mcp:mcinjector:3.7.7') {
+        exclude module: 'gson'
+    }
     mcinjectstartImplementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
     forgeflower 'net.minecraftforge:fernflower:2.0-SNAPSHOT'
     implementation 'com.cloudbees:diff4j:1.1'
