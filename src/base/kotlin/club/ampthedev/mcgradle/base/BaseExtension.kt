@@ -6,10 +6,10 @@ import club.ampthedev.mcgradle.base.utils.checkValidConstantProperty
 import club.ampthedev.mcgradle.base.versioning.GitVersion
 import org.gradle.api.Project
 
-abstract class BaseExtension(private val project: Project) : GroovyObjectSupport() {
+abstract class BaseExtension(private val currentProject: Project) : GroovyObjectSupport() {
     var version = "1.8.9"
     var mappingChannel = "stable"
-    var mappingVersion = "22"
+    var mappingVersion = "22-1.8.9"
     var runDirectory = "run"
     var clientMainClass = "net.minecraft.client.main.Main"
     var serverMainClass = "net.minecraft.server.MinecraftServer"
@@ -18,7 +18,7 @@ abstract class BaseExtension(private val project: Project) : GroovyObjectSupport
     var kotlinVersion: String? = null
     var gitVersion: Boolean = false
         set(v) {
-            project.version = GitVersion.gitVersion(project.projectDir)
+            currentProject.version = GitVersion.gitVersion(currentProject.projectDir)
             field = v
         }
     val properties = hashMapOf<String, Any>()

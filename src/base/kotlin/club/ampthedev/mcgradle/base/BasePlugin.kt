@@ -58,7 +58,7 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
         project.dependencies.add(CONFIGURATION_MCP_DATA, mapOf(
                 "group" to "de.oceanlabs.mcp",
                 "name" to "mcp_${extension.mappingChannel}",
-                "version" to "${extension.mappingVersion}-${extension.version}",
+                "version" to extension.mappingVersion,
                 "ext" to "zip"
         ))
 

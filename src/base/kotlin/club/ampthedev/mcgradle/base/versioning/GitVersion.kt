@@ -8,6 +8,7 @@ import java.io.File
 
 object GitVersion {
     fun gitVersion(dir: File) = try {
+        if (!File(dir, ".git").isDirectory) error("Not a git repository")
         val git = Git.init().setDirectory(dir).call()
         val headId = git.repository.resolve(Constants.HEAD)
         val revs = arrayListOf<String>()
