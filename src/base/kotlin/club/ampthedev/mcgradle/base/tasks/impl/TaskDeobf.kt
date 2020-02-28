@@ -155,7 +155,7 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, GENERATE_MAPPINGS) {
 
     private fun File.loadMCIJson(): MutableMap<String, MCInjectorStruct> {
         val ret = linkedMapOf<String, MCInjectorStruct>()
-        val obj = reader().use { JsonParser.parseReader(it).asJsonObject }
+        val obj = reader().use { JsonParser().parse(it).asJsonObject }
 
         for (entry in obj.entrySet()) {
             ret[entry.key] = Gson().fromJson(entry.value, MCInjectorStruct::class.java)

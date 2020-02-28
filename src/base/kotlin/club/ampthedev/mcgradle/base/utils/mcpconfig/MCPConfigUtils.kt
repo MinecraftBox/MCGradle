@@ -112,7 +112,7 @@ object MCPConfigUtils {
 
         if (project.newConfig) {
             val configFile = project.mcgFile("$MAPPINGS_DIRECTORY/config.json")
-            config = configFile.bufferedReader().use { JsonParser.parseReader(it) }.asJsonObject
+            config = configFile.bufferedReader().use { JsonParser().parse(it) }.asJsonObject
             for (element in config.getAsJsonObject("data").entrySet()) {
                 if (element.value.isJsonPrimitive) {
                     data[element.key] = project.mcgFile("$MAPPINGS_DIRECTORY/${element.value.asString}")

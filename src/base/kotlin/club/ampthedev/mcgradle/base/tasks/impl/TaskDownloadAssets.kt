@@ -21,7 +21,7 @@ open class TaskDownloadAssets : BaseTask(DOWNLOAD_ASSET_INDEX) {
 
     @TaskAction
     fun download() {
-        val obj1 = assetIndex.bufferedReader().use { JsonParser.parseReader(it) }.asJsonObject
+        val obj1 = assetIndex.bufferedReader().use { JsonParser().parse(it) }.asJsonObject
         val objectsDir = File(assetDir, "objects")
         for (entry in obj1.getAsJsonObject("objects").entrySet()) {
             val obj = entry.value.asJsonObject

@@ -125,7 +125,7 @@ fun Project.getVersionJson(): JsonObject {
             versionJsonFile.bufferedWriter().use { it.write(result) }
             result
         }
-        versionJsonObj[this] = JsonParser.parseString(versionJsonContent).asJsonObject
+        versionJsonObj[this] = JsonParser().parse(versionJsonContent).asJsonObject
     }
     return versionJsonObj[this]!!
 }
