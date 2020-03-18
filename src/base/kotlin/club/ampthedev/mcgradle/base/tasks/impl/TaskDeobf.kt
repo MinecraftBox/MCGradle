@@ -14,7 +14,9 @@ import net.md_5.specialsource.provider.JointProvider
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.*
 import java.io.File
+import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
+import java.util.zip.ZipOutputStream
 
 class MCInjectorStruct {
     var innerClasses: MutableList<InnerClass>? = null
@@ -54,7 +56,7 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, GENERATE_MAPPINGS) {
 
     @TaskAction
     fun deobf() {
-        val tempObfJar = if (skipExceptor) {
+        var tempObfJar = if (skipExceptor) {
             out
         } else {
             File(project.string(DEOBF_TEMP_JAR))
@@ -69,6 +71,9 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, GENERATE_MAPPINGS) {
             jar
         }
         if (project.newConfig) {
+            val temp2 = File(temporaryDir, "deobfTemp2.jar")
+            if (skipExceptor) tempObfJar = temp2
+
             MCPConfigUtils.runTask(
                 project,
                 "rename",
@@ -79,9 +84,31 @@ open class TaskDeobf : BaseTask(TaskType.OTHER, GENERATE_MAPPINGS) {
             if (!skipExceptor) {
                 MCPConfigUtils.runTask(project,
                 "mcinject",
-                out,
+                temp2,
                 File(temporaryDir, "mcinject.log"),
                 input = tempObfJar)
+            }
+            ZipOutputStream(out.outputStream()).use { out ->
+                ZipFile(temp2).use { zip ->
+                    // copy all existing entries
+                    zip.entries().iterator().forEach { entry ->
+                        if (!entry.isDirectory) {
+                            out.putNextEntry(ZipEntry(entry.name))
+                            zip.getInputStream(entry).use { it.copyTo(out) }
+                        }
+                    }
+                    // inject distmarker classes
+                    ZipFile(MCPConfigUtils.getTaskJar(project, "merge")).use { zip2 ->
+                        for (entryName in arrayOf("Dist", "OnlyIn", "OnlyIns")) {
+                            val entryPath = "net/minecraftforge/api/distmarker/$entryName.class"
+                            val entry = zip2.getEntry(entryPath)
+                            entry?.let { entry1 ->
+                                out.putNextEntry(ZipEntry(entryPath))
+                                zip2.getInputStream(entry1)?.use { it.copyTo(out) }
+                            }
+                        }
+                    }
+                }
             }
         } else {
             toDeobf.deobfJar(tempObfJar, srg)
