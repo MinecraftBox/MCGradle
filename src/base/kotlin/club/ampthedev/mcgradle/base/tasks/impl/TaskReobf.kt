@@ -25,9 +25,6 @@ open class TaskReobf : BaseTask(GENERATE_MAPPINGS) {
     lateinit var srg: File
 
     @InputFile
-    lateinit var exc: File
-
-    @InputFile
     lateinit var methodsCsv: File
 
     @InputFile
@@ -42,7 +39,6 @@ open class TaskReobf : BaseTask(GENERATE_MAPPINGS) {
     override fun setup() {
         if (!::deobfJar.isInitialized) deobfJar = project.mcgFile(DEOBFED_JAR)
         if (!::srg.isInitialized) srg = project.mcgFile(MCP_NOTCH)
-        if (!::exc.isInitialized) exc = project.mcgFile(MCP_EXC)
         if (!::methodsCsv.isInitialized) methodsCsv = project.mcgFile(METHODS_CSV)
         if (!::fieldsCsv.isInitialized) fieldsCsv = project.mcgFile(FIELDS_CSV)
         if (!::libs.isInitialized) libs = project.configurations.getByName(CONFIGURATION_MC_DEPS)
@@ -50,17 +46,16 @@ open class TaskReobf : BaseTask(GENERATE_MAPPINGS) {
 
     @TaskAction
     fun reobfuscate() {
-        val exceptor = ReobfExceptor()
+        /*val exceptor = ReobfExceptor()
         exceptor.toReobfJar = input
         exceptor.deobfJar = deobfJar
-        exceptor.excConfig = exc
         exceptor.fieldCSV = fieldsCsv
         exceptor.methodCSV = methodsCsv
         val out = File(temporaryDir, "class_reobf.srg")
         exceptor.doFirstThings()
-        exceptor.buildSrg(srg, out)
+        exceptor.buildSrg(srg, out)*/
         val mapping = JarMapping()
-        mapping.loadMappings(out.bufferedReader(), null, null, false)
+        mapping.loadMappings(srg.bufferedReader(), null, null, false)
         val remapper = JarRemapper(null, mapping)
         val input = Jar.init(input)
         val inheritanceProviders = JointProvider()
