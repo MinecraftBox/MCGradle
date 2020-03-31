@@ -52,10 +52,10 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
         for (element in project.getVersionJson().getAsJsonArray("libraries")) {
             val obj = element.asJsonObject
             if (shouldIncludeDependency(obj)) {
-                val data = getDependencyUrl(obj)
+                val data = getDependencyData(obj)
                 val file = File(project.mcgFile(CACHE_DIR), "dependencies/${data.first.replace(':', '_')}")
                 prepareDirectory(file.parentFile)
-                BasicDownloadTask.download(data.second, file, data.third, print = true)
+                BasicDownloadTask.download(data.second, file, data.third.first, print = true)
                 project.dependencies.add(CONFIGURATION_MC_DEPS, project.files(file))
             }
         }
