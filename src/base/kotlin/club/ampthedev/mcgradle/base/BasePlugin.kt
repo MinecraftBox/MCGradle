@@ -1,10 +1,12 @@
 package club.ampthedev.mcgradle.base
 
 import club.ampthedev.mcgradle.base.tasks.BaseTask
+import club.ampthedev.mcgradle.base.tasks.BasicDownloadTask
 import club.ampthedev.mcgradle.base.utils.*
 import club.ampthedev.mcgradle.base.utils.mcpconfig.MCPConfigUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import java.io.File
 import kotlin.reflect.KClass
 
 abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
@@ -50,7 +52,11 @@ abstract class BasePlugin<T : BaseExtension> : Plugin<Project> {
         for (element in project.getVersionJson().getAsJsonArray("libraries")) {
             val obj = element.asJsonObject
             if (shouldIncludeDependency(obj)) {
-                project.dependencies.add(CONFIGURATION_MC_DEPS, getDependencyString(obj))
+                val data = getDependencyUrl(obj)
+                val file = File(project.mcgFile(CACHE_DIR), "dependencies/${data.first.replace(':', '_')}")
+                prepareDirectory(file.parentFile)
+                BasicDownloadTask.download(data.second, file, data.third, print = true)
+                project.dependencies.add(CONFIGURATION_MC_DEPS, project.files(file))
             }
         }
 
