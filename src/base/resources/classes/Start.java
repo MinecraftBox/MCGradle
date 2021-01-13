@@ -87,7 +87,7 @@ public final class Start {
                 auth.logIn();
             }
             config = new JsonObject();
-            config.addProperty("clientToken", authService.getClientToken());
+            config.addProperty("clientToken", clientToken);
             config.add("authlibData", GSON.toJsonTree(auth.saveForStorage()));
             if (!configFile.getParentFile().exists()) {
                 if (!configFile.getParentFile().mkdirs()) {
